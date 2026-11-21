@@ -30,15 +30,15 @@ input,select{font:inherit;color:var(--ink);background:var(--card);border:1px sol
 input[type=search]{flex:1;min-width:140px}
 .tablewrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);width:fit-content;max-width:100%}
 table{border-collapse:collapse;width:auto;min-width:0;background:var(--card)}
-th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-thead th{text-align:right}
+th,td{padding:7px 14px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
 th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);font-weight:600;font-size:13.5px;min-width:6em;max-width:8.5em;white-space:normal;line-height:1.25}
 thead th{background:var(--chip);font-size:13px}
 tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700;text-align:left}
 .rng{font-variant-numeric:tabular-nums}
 .lo{font-weight:700}
-.l{display:grid;grid-template-columns:.9em 4.9em 3.9em auto;column-gap:4px;align-items:baseline;justify-content:start;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
-.l.nl{grid-template-columns:4.9em 3.9em auto}
+.l{position:relative;width:max-content;margin:0 auto;display:grid;grid-template-columns:1em 4.9em 3.9em;column-gap:8px;align-items:baseline;justify-content:center;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
+.l.nl{grid-template-columns:4.9em 3.9em;column-gap:8px}
+.l .d{position:absolute;left:100%;top:0;margin-left:-2px;white-space:nowrap}
 .l .t{font-size:10px;color:var(--sub);text-align:center}
 .l b{font-weight:700;text-align:right}
 .l em{font-style:normal;font-size:10.5px;color:var(--sub);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -46,7 +46,7 @@ tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700
 .th-u{display:block;font-size:10px;color:var(--sub);font-weight:400}
 .n{display:none}
 .thin .rng{color:var(--sub)}
-.thin .l:last-child::after{content:"※";color:var(--warn);font-size:10px}
+.thin .l:last-child::after{content:"※";color:var(--warn);font-size:10px;position:absolute;left:100%;top:0;margin-left:2px}
 .d{font-size:11px;margin-left:4px}
 .up{color:var(--up)} .down{color:var(--down)}
 .note{color:var(--sub);font-size:12.5px;margin:8px 2px}
@@ -61,7 +61,7 @@ tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700
 svg text{fill:var(--sub);font-size:11px}
 .legend{font-size:12.5px;color:var(--sub);margin-top:6px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 10px;vertical-align:-1px}
-@media(max-width:560px){.l{grid-template-columns:.9em 4.4em 3.3em auto!important}.l.nl{grid-template-columns:4.4em 3.3em auto!important}th,td{padding:6px 4px}.l{column-gap:3px}th:first-child,td:first-child{font-size:12.5px;min-width:4.6em;max-width:6.2em}.bars .row{grid-template-columns:84px 1fr 68px}}
+@media(max-width:560px){.l{grid-template-columns:.9em 4.4em 3.3em!important;column-gap:5px}.l.nl{grid-template-columns:4.4em 3.3em!important}th,td{padding:6px 4px}.l{column-gap:3px}th:first-child,td:first-child{font-size:12.5px;min-width:4.6em;max-width:6.2em}.bars .row{grid-template-columns:84px 1fr 68px}}
 .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .seg button{border:0;background:var(--card);color:var(--sub);padding:8px 12px;font:inherit;font-size:13.5px;cursor:pointer}
 .seg button.on{background:var(--ink);color:var(--bg)}
@@ -73,6 +73,23 @@ svg text{fill:var(--sub);font-size:11px}
 .cdr .g{color:var(--sub);font-weight:700;grid-row:span 2}
 .cdr .v{font-variant-numeric:tabular-nums}.cdr .bb{font-size:11px;color:var(--sub)}
 .cdr.thin .v{color:var(--sub)}
+.tl td,.tl th{padding:11px 22px}
+.tl th:first-child,.tl td:first-child{min-width:11em;max-width:none;white-space:nowrap;font-size:14px}
+.tl .l{column-gap:10px;font-size:14px}
+.tl td:last-child{color:var(--sub)}
+@media(max-width:560px){.tl td,.tl th{padding:10px 6px}.tl th:first-child,.tl td:first-child{min-width:0;white-space:normal;font-size:12.5px}.tl .l{font-size:13px}}
+th:first-child,td:first-child{white-space:nowrap;min-width:9em;max-width:none}
+td.wrapok{white-space:normal!important;max-width:11em!important}
+tr.grp td:not(:first-child){text-align:center}
+@media(max-width:560px){th:first-child,td:first-child{min-width:5.2em;max-width:6.5em;white-space:normal;word-break:keep-all;font-size:12.5px}.tl th:first-child,.tl td:first-child{min-width:0}}
+.l.lb{grid-template-columns:6em 3.9em;column-gap:8px}
+.l.lb .t{margin-right:5px}
+@media(max-width:560px){.l.lb{grid-template-columns:5.3em 3.3em!important;column-gap:5px}}
+@media(max-width:560px){
+ th:first-child,td:first-child{white-space:nowrap!important;min-width:0!important;max-width:none!important;font-size:12px;word-break:keep-all}
+ td.wrapm{white-space:normal!important;max-width:7.2em!important}
+ .st{margin-right:0}
+}
 </style>
 </head>
 <body>
@@ -148,18 +165,18 @@ function viewToday(){
     if(MODE==="grid"){
       let last="",rows="";
       ps.forEach(p=>{const g=isFrozen(p)?"냉동":"냉장";
-        if(g!==last){rows+=`<tr class="grp"><td colspan="${GRADES.length+1}">${g}</td></tr>`;last=g}
-        rows+=`<tr><td>${star(p)} ${p}</td>`+GRADES.map(gr=>{
+        if(g!==last){rows+=`<tr class="grp"><td>${g}</td>${GRADES.map(x=>`<td>${x} <span style="font-weight:400">원/Kg</span></td>`).join("")}</tr>`;last=g}
+        rows+=`<tr><td class="${p.length>12?'wrapok':''} ${p.length>9?'wrapm':''}">${star(p)} ${p}</td>`+GRADES.map(gr=>{
           const r=get(TODAY,p,gr); if(!r) return `<td class="rng" style="color:var(--sub)">-</td>`;
           const o=pd?get(pd,p,gr):null;
-          return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l"><span class="t">저</span><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div><div class="l hi"><span class="t">고</span><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td>`}).join("")+"</tr>"});
+          return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l lb"><b><span class="t">저</span>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div><div class="l lb hi"><b><span class="t">고</span>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td>`}).join("")+"</tr>"});
       out=`<div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}<span class="th-u">원/Kg</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty">결과가 없어요</td></tr>`}</tbody></table></div>`;
       $("#nt").textContent="저=Kg당 최저가 · 고=Kg당 최고가 · 옆 글씨는 브랜드 · ※ 는 상품 3개 이하(참고용)"+(pd?" · ▲▼ 전일 대비 최저가":"");
     }else if(MODE==="list"){
       const g=$("#lg").value; LG=g; SORT=$("#so").value;
       let rs=ps.map(p=>get(TODAY,p,g)).filter(Boolean);
       if(SORT==="asc") rs.sort((a,b)=>a.min_kg-b.min_kg); else if(SORT==="desc") rs.sort((a,b)=>b.min_kg-a.min_kg);
-      out=`<div class="tablewrap"><table><thead><tr><th>부위 (${g})</th><th>최저</th><th>최고</th><th>상품</th></tr></thead><tbody>`+
+      out=`<div class="tablewrap"><table class="tl"><thead><tr><th>부위 (${g})</th><th>최저</th><th>최고</th><th>상품</th></tr></thead><tbody>`+
         (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${r.part}</td><td><div class="l nl"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div></td><td><div class="l nl hi"><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
       $("#nt").textContent="단위: 원/Kg · 등급을 고르고 정렬을 바꿔보세요. ※ 는 상품 3개 이하(참고용)";
     }else{
