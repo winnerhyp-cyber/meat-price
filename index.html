@@ -29,16 +29,22 @@ main{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
 input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 input[type=search]{flex:1;min-width:140px}
 .tablewrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
-table{border-collapse:collapse;width:100%;min-width:640px;background:var(--card)}
-th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);font-weight:600}
+table{border-collapse:collapse;width:100%;min-width:760px;background:var(--card)}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);font-weight:600;font-size:13.5px;min-width:7.5em;max-width:9em;white-space:normal;line-height:1.25}
 thead th{background:var(--chip);font-size:13px}
 tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700;text-align:left}
 .rng{font-variant-numeric:tabular-nums}
 .lo{font-weight:700}
-.n{display:block;font-size:11px;color:var(--sub)}
+.l{display:flex;justify-content:flex-end;align-items:baseline;gap:5px;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
+.l b{font-weight:700}
+.l .t{font-size:10px;color:var(--sub);flex:none}
+.l em{font-style:normal;font-size:10.5px;color:var(--sub);max-width:4.6em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l.hi b{font-weight:500}
+.th-u{display:block;font-size:10px;color:var(--sub);font-weight:400}
+.n{display:none}
 .thin .rng{color:var(--sub)}
-.thin .n::after{content:" ※"; color:var(--warn)}
+.thin .l:last-child::after{content:"※";color:var(--warn);font-size:10px}
 .d{font-size:11px;margin-left:4px}
 .up{color:var(--up)} .down{color:var(--down)}
 .note{color:var(--sub);font-size:12.5px;margin:8px 2px}
@@ -54,6 +60,17 @@ svg text{fill:var(--sub);font-size:11px}
 .legend{font-size:12.5px;color:var(--sub);margin-top:6px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 10px;vertical-align:-1px}
 @media(max-width:560px){.bars .row{grid-template-columns:84px 1fr 68px}}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--card);color:var(--sub);padding:8px 12px;font:inherit;font-size:13.5px;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.st{cursor:pointer;color:var(--sub);margin-right:2px}.st.on{color:#e0a100}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cdh{margin-bottom:4px}
+.cdr{display:grid;grid-template-columns:34px 1fr;gap:0 8px;padding:3px 0;border-top:1px solid var(--line);font-size:13.5px}
+.cdr .g{color:var(--sub);font-weight:700;grid-row:span 2}
+.cdr .v{font-variant-numeric:tabular-nums}.cdr .bb{font-size:11px;color:var(--sub)}
+.cdr.thin .v{color:var(--sub)}
 </style>
 </head>
 <body>
@@ -101,29 +118,58 @@ function delta(cur,old){
   return `<span class="d ${cur>old?'up':'down'}">${cur>old?'▲':'▼'}${Math.abs(p).toFixed(1)}%</span>`;
 }
 
+function favs(){try{return JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){return[]}}
+function toggleFav(p){try{const f=favs();const i=f.indexOf(p);i<0?f.push(p):f.splice(i,1);localStorage.setItem("fav",JSON.stringify(f))}catch(e){}}
+let MODE="grid", LG="1++", SORT="part";
+const br=b=>b?`<em title="${b}">${b}</em>`:"";
+const star=p=>`<span class="st ${favs().includes(p)?'on':''}" data-p="${p}" title="즐겨찾기">${favs().includes(p)?'★':'☆'}</span>`;
+
 function viewToday(){
   const pd=prevDay();
-  let h=`<div class="tools"><input type="search" id="q" placeholder="부위 검색 (예: 안심, 갈비)">
-  <select id="fz"><option value="">냉장+냉동</option><option value="c">냉장만</option><option value="f">냉동만</option></select></div>
-  <div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}</th>`).join("")}</tr></thead><tbody id="tb"></tbody></table></div>
-  <div class="note">칸 안: 최저 ~ 최고 (Kg당 원) · 아래 작은 글씨는 상품 수 · ※ 는 상품 3개 이하(참고용) · ▲▼ 는 전일 대비 최저가 변화${pd?"":" (2일차부터 표시)"}</div>`;
-  $("#view").innerHTML=h;
+  $("#view").innerHTML=`<div class="tools">
+    <div class="seg" id="seg"><button data-m="grid">가로 표</button><button data-m="list">등급별 목록</button><button data-m="card">카드</button></div>
+    <select id="lg" style="display:none">${GRADES.map(g=>`<option>${g}</option>`).join("")}</select>
+    <select id="so" style="display:none"><option value="part">부위순</option><option value="asc">싼 순(최저가)</option><option value="desc">비싼 순(최저가)</option></select>
+  </div><div class="tools"><input type="search" id="q" placeholder="부위 검색 (예: 안심, 갈비)">
+    <select id="fz"><option value="">냉장+냉동</option><option value="c">냉장만</option><option value="f">냉동만</option></select>
+    <label style="font-size:13px"><input type="checkbox" id="fv"> ★ 즐겨찾기만</label></div>
+  <div id="out"></div>
+  <div class="note" id="nt"></div>`;
+  $("#lg").value=LG; $("#so").value=SORT;
+  const filt=()=>{const q=$("#q").value.trim(),fz=$("#fz").value,fv=$("#fv").checked,f=favs();
+    return parts().filter(p=>(!q||p.includes(q))&&(!fz||(fz==="f")===isFrozen(p))&&(!fv||f.includes(p)))};
   const draw=()=>{
-    const q=$("#q").value.trim(), fz=$("#fz").value;
-    let out="", last="";
-    parts().filter(p=>(!q||p.includes(q))&&(!fz||(fz==="f")===isFrozen(p))).forEach(p=>{
-      const g=isFrozen(p)?"냉동":"냉장";
-      if(g!==last){out+=`<tr class="grp"><td colspan="${GRADES.length+1}">${g}</td></tr>`;last=g}
-      out+=`<tr><td>${p}</td>`+GRADES.map(gr=>{
-        const r=get(TODAY,p,gr);
-        if(!r) return `<td class="rng" style="color:var(--sub)">-</td>`;
-        const o=pd?get(pd,p,gr):null;
-        return `<td class="${r.total<=3?'thin':''}"><span class="rng"><span class="lo">${won(r.min_kg)}</span>${delta(r.min_kg,o&&o.min_kg)}<br>~ ${won(r.max_kg)}</span><span class="n">${r.total}건</span></td>`;
-      }).join("")+"</tr>";
-    });
-    $("#tb").innerHTML=out||`<tr><td colspan="6" class="empty">검색 결과가 없어요</td></tr>`;
+    document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x.dataset.m===MODE));
+    $("#lg").style.display=MODE==="list"?"":"none"; $("#so").style.display=MODE==="list"?"":"none";
+    const ps=filt(); let out="";
+    if(MODE==="grid"){
+      let last="",rows="";
+      ps.forEach(p=>{const g=isFrozen(p)?"냉동":"냉장";
+        if(g!==last){rows+=`<tr class="grp"><td colspan="${GRADES.length+1}">${g}</td></tr>`;last=g}
+        rows+=`<tr><td>${star(p)} ${p}</td>`+GRADES.map(gr=>{
+          const r=get(TODAY,p,gr); if(!r) return `<td class="rng" style="color:var(--sub)">-</td>`;
+          const o=pd?get(pd,p,gr):null;
+          return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l"><span class="t">저</span><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div><div class="l hi"><span class="t">고</span><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td>`}).join("")+"</tr>"});
+      out=`<div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}<span class="th-u">원/Kg</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty">결과가 없어요</td></tr>`}</tbody></table></div>`;
+      $("#nt").textContent="저=Kg당 최저가 · 고=Kg당 최고가 · 옆 글씨는 브랜드 · ※ 는 상품 3개 이하(참고용)"+(pd?" · ▲▼ 전일 대비 최저가":"");
+    }else if(MODE==="list"){
+      const g=$("#lg").value; LG=g; SORT=$("#so").value;
+      let rs=ps.map(p=>get(TODAY,p,g)).filter(Boolean);
+      if(SORT==="asc") rs.sort((a,b)=>a.min_kg-b.min_kg); else if(SORT==="desc") rs.sort((a,b)=>b.min_kg-a.min_kg);
+      out=`<div class="tablewrap"><table style="min-width:0"><thead><tr><th>부위 (${g})</th><th>최저 원/Kg</th><th>최고 원/Kg</th><th>상품</th></tr></thead><tbody>`+
+        (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${r.part}</td><td><div class="l"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div></td><td><div class="l hi"><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
+      $("#nt").textContent="등급을 고르고 정렬을 바꿔보세요. ※ 는 상품 3개 이하(참고용)";
+    }else{
+      out=`<div class="cards">`+(ps.map(p=>`<div class="cd"><div class="cdh">${star(p)} <b>${p}</b></div>`+GRADES.map(gr=>{
+        const r=get(TODAY,p,gr); if(!r) return "";
+        return `<div class="cdr ${r.total<=3?'thin':''}"><span class="g">${gr}</span><span class="v"><b>${won(r.min_kg)}</b> ~ ${won(r.max_kg)}</span><span class="bb">${r.min_brand||""}${r.min_brand&&r.max_brand&&r.min_brand!==r.max_brand?" / "+r.max_brand:""}</span></div>`}).join("")+`</div>`).join("")||`<div class="empty">결과가 없어요</div>`)+`</div>`;
+      $("#nt").textContent="카드 한 장에 등급별 최저 ~ 최고 (원/Kg)와 브랜드";
+    }
+    $("#out").innerHTML=out;
   };
-  $("#q").oninput=draw; $("#fz").onchange=draw; draw();
+  $("#seg").onclick=e=>{const b=e.target.closest("button");if(b){MODE=b.dataset.m;draw()}};
+  $("#out").onclick=e=>{const s=e.target.closest(".st");if(s){toggleFav(s.dataset.p);draw()}};
+  ["q","fz","fv","lg","so"].forEach(i=>{$("#"+i).oninput=draw;$("#"+i).onchange=draw}); draw();
 }
 
 function viewCmp(){

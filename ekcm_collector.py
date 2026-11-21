@@ -163,7 +163,7 @@ def export_latest(con, day):
 
 def export_history(con):
     """모든 날짜 기록을 history.json 으로 저장 (대시보드 추이/알림용, 용량 줄이려고 핵심 열만)"""
-    keep = ["day", "part", "grade_f", "total", "min_kg", "max_kg", "min_all_kg", "max_all_kg"]
+    keep = ["day", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand", "min_all_kg", "max_all_kg"]
     con.row_factory = sqlite3.Row
     out = [{k: r[k] for k in keep} for r in con.execute(
         "SELECT * FROM price_range WHERE total>0 ORDER BY day, rowid")]
@@ -176,7 +176,7 @@ def import_history(con):
     import os
     if not os.path.exists("history.json"):
         return
-    keep = ["day", "part", "grade_f", "total", "min_kg", "max_kg", "min_all_kg", "max_all_kg"]
+    keep = ["day", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand", "min_all_kg", "max_all_kg"]
     for r in json.load(open("history.json", encoding="utf-8")):
         con.execute("INSERT OR IGNORE INTO price_range (%s) VALUES (%s)" % (
             ",".join(keep), ",".join(":" + k for k in keep)), r)
