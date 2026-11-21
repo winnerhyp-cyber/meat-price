@@ -156,6 +156,8 @@ def export_latest(con, day):
     out = [dict(r) for r in con.execute(
         "SELECT * FROM price_range WHERE day=? AND total>0 ORDER BY rowid", (day,))]
     con.row_factory = None
+    out.sort(key=lambda r: (PARTS.index(r["part"]) if r["part"] in PARTS else 999,
+                            GRADES.index(r["grade_f"]) if r["grade_f"] in GRADES else 9))
     json.dump(out, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     export_history(con)
     return len(out)

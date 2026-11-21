@@ -118,6 +118,7 @@ async function load(){
   let latest=[], hist=[];
   try{ latest=await (await fetch("latest.json",{cache:"no-store"})).json(); }catch(e){}
   if(!latest.length && window.EMBED) latest=window.EMBED;
+  if(!hist.length && window.EMBED_HIST) hist=window.EMBED_HIST;
   try{ hist=await (await fetch("history.json",{cache:"no-store"})).json(); }catch(e){}
   const map=new Map();
   [...hist,...latest].forEach(r=>map.set(r.day+"|"+r.part+"|"+r.grade_f,r));
@@ -130,7 +131,9 @@ async function load(){
 const rowsOf=d=>ALL.filter(r=>r.day===d);
 const get=(d,p,g)=>ALL.find(r=>r.day===d&&r.part===p&&r.grade_f===g);
 const prevDay=()=>DAYS.length>1?DAYS[DAYS.length-2]:null;
-const parts=()=>{const s=[];rowsOf(TODAY).forEach(r=>{if(!s.includes(r.part))s.push(r.part)});return s};
+const PART_ORDER=["안심", "등심", "윗등심", "아랫등심", "채끝", "목심", "앞다리살", "앞다리살(앞다리+꾸리)", "꾸리살", "부채살", "우둔살", "홍두깨", "설도", "설도(삼각살 X)", "설깃", "삼각살", "양지머리,치마양지", "양지머리 외", "치마살", "차돌박이(냉장)", "업진살", "앞치마살,업진안살", "앞치마살", "업진안살", "사태", "갈비", "갈비살", "안창살", "갈비본살+갈비살치", "토시살", "늑간살", "토시,제비추리", "제비추리", "안창외2종", "차돌박이", "냉동목심", "냉동설깃", "냉동앞다리", "냉동설도", "냉동사태", "냉동우둔", "냉동양지머리,치마양지", "냉동갈비"];
+const pidx=p=>{const i=PART_ORDER.indexOf(p);return i<0?999:i};
+const parts=()=>{const s=[];rowsOf(TODAY).forEach(r=>{if(!s.includes(r.part))s.push(r.part)});return s.sort((a,b)=>pidx(a)-pidx(b))};
 
 function delta(cur,old){
   if(old==null||cur==null||cur===old) return "";
