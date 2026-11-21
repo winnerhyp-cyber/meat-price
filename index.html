@@ -28,18 +28,20 @@ main{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
 input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 input[type=search]{flex:1;min-width:140px}
-.tablewrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
-table{border-collapse:collapse;width:100%;min-width:760px;background:var(--card)}
-th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);font-weight:600;font-size:13.5px;min-width:7.5em;max-width:9em;white-space:normal;line-height:1.25}
+.tablewrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);width:fit-content;max-width:100%}
+table{border-collapse:collapse;width:auto;min-width:0;background:var(--card)}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+thead th{text-align:right}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);font-weight:600;font-size:13.5px;min-width:6em;max-width:8.5em;white-space:normal;line-height:1.25}
 thead th{background:var(--chip);font-size:13px}
 tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700;text-align:left}
 .rng{font-variant-numeric:tabular-nums}
 .lo{font-weight:700}
-.l{display:flex;justify-content:flex-end;align-items:baseline;gap:5px;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
-.l b{font-weight:700}
-.l .t{font-size:10px;color:var(--sub);flex:none}
-.l em{font-style:normal;font-size:10.5px;color:var(--sub);max-width:4.6em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l{display:grid;grid-template-columns:.9em 4.9em 3.9em auto;column-gap:4px;align-items:baseline;justify-content:start;font-size:13px;line-height:1.35;font-variant-numeric:tabular-nums}
+.l.nl{grid-template-columns:4.9em 3.9em auto}
+.l .t{font-size:10px;color:var(--sub);text-align:center}
+.l b{font-weight:700;text-align:right}
+.l em{font-style:normal;font-size:10.5px;color:var(--sub);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .l.hi b{font-weight:500}
 .th-u{display:block;font-size:10px;color:var(--sub);font-weight:400}
 .n{display:none}
@@ -59,7 +61,7 @@ tr.grp td{background:var(--chip);color:var(--sub);font-size:12px;font-weight:700
 svg text{fill:var(--sub);font-size:11px}
 .legend{font-size:12.5px;color:var(--sub);margin-top:6px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 10px;vertical-align:-1px}
-@media(max-width:560px){.bars .row{grid-template-columns:84px 1fr 68px}}
+@media(max-width:560px){.l{grid-template-columns:.9em 4.4em 3.3em auto!important}.l.nl{grid-template-columns:4.4em 3.3em auto!important}th,td{padding:6px 4px}.l{column-gap:3px}th:first-child,td:first-child{font-size:12.5px;min-width:4.6em;max-width:6.2em}.bars .row{grid-template-columns:84px 1fr 68px}}
 .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .seg button{border:0;background:var(--card);color:var(--sub);padding:8px 12px;font:inherit;font-size:13.5px;cursor:pointer}
 .seg button.on{background:var(--ink);color:var(--bg)}
@@ -121,7 +123,8 @@ function delta(cur,old){
 function favs(){try{return JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){return[]}}
 function toggleFav(p){try{const f=favs();const i=f.indexOf(p);i<0?f.push(p):f.splice(i,1);localStorage.setItem("fav",JSON.stringify(f))}catch(e){}}
 let MODE="grid", LG="1++", SORT="part";
-const br=b=>b?`<em title="${b}">${b}</em>`:"";
+const sb=b=>b.replace(/한우$/,"").replace(/대한으로$/,"");
+const br=b=>b?`<em title="${b}">${sb(b)}</em>`:"";
 const star=p=>`<span class="st ${favs().includes(p)?'on':''}" data-p="${p}" title="즐겨찾기">${favs().includes(p)?'★':'☆'}</span>`;
 
 function viewToday(){
@@ -156,9 +159,9 @@ function viewToday(){
       const g=$("#lg").value; LG=g; SORT=$("#so").value;
       let rs=ps.map(p=>get(TODAY,p,g)).filter(Boolean);
       if(SORT==="asc") rs.sort((a,b)=>a.min_kg-b.min_kg); else if(SORT==="desc") rs.sort((a,b)=>b.min_kg-a.min_kg);
-      out=`<div class="tablewrap"><table style="min-width:0"><thead><tr><th>부위 (${g})</th><th>최저 원/Kg</th><th>최고 원/Kg</th><th>상품</th></tr></thead><tbody>`+
-        (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${r.part}</td><td><div class="l"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div></td><td><div class="l hi"><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
-      $("#nt").textContent="등급을 고르고 정렬을 바꿔보세요. ※ 는 상품 3개 이하(참고용)";
+      out=`<div class="tablewrap"><table><thead><tr><th>부위 (${g})</th><th>최저</th><th>최고</th><th>상품</th></tr></thead><tbody>`+
+        (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${r.part}</td><td><div class="l nl"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div></td><td><div class="l nl hi"><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
+      $("#nt").textContent="단위: 원/Kg · 등급을 고르고 정렬을 바꿔보세요. ※ 는 상품 3개 이하(참고용)";
     }else{
       out=`<div class="cards">`+(ps.map(p=>`<div class="cd"><div class="cdh">${star(p)} <b>${p}</b></div>`+GRADES.map(gr=>{
         const r=get(TODAY,p,gr); if(!r) return "";
