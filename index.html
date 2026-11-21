@@ -90,6 +90,7 @@ tr.grp td:not(:first-child){text-align:center}
  td.wrapm{white-space:normal!important;max-width:7.2em!important}
  .st{margin-right:0}
 }
+.gu{font-size:10px;font-weight:400;color:var(--sub);margin-left:2px}
 </style>
 </head>
 <body>
@@ -165,12 +166,12 @@ function viewToday(){
     if(MODE==="grid"){
       let last="",rows="";
       ps.forEach(p=>{const g=isFrozen(p)?"냉동":"냉장";
-        if(g!==last){rows+=`<tr class="grp"><td>${g}</td>${GRADES.map(x=>`<td>${x} <span style="font-weight:400">원/Kg</span></td>`).join("")}</tr>`;last=g}
+        if(g!==last){rows+=`<tr class="grp"><td>${g}</td>${GRADES.map(x=>`<td>${x} <span class="gu">(원/Kg)</span></td>`).join("")}</tr>`;last=g}
         rows+=`<tr><td class="${p.length>12?'wrapok':''} ${p.length>9?'wrapm':''}">${star(p)} ${p}</td>`+GRADES.map(gr=>{
           const r=get(TODAY,p,gr); if(!r) return `<td class="rng" style="color:var(--sub)">-</td>`;
           const o=pd?get(pd,p,gr):null;
           return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l lb"><b><span class="t">저</span>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div><div class="l lb hi"><b><span class="t">고</span>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td>`}).join("")+"</tr>"});
-      out=`<div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}<span class="th-u">원/Kg</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty">결과가 없어요</td></tr>`}</tbody></table></div>`;
+      out=`<div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}<span class="th-u">(원/Kg)</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty">결과가 없어요</td></tr>`}</tbody></table></div>`;
       $("#nt").textContent="저=Kg당 최저가 · 고=Kg당 최고가 · 옆 글씨는 브랜드 · ※ 는 상품 3개 이하(참고용)"+(pd?" · ▲▼ 전일 대비 최저가":"");
     }else if(MODE==="list"){
       const g=$("#lg").value; LG=g; SORT=$("#so").value;
