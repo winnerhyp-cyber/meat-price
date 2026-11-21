@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   collect:
@@ -17,17 +18,61 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check password secret
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: |
+          if [ -z "$SITE_PASSWORD" ]; then
+            echo "SITE_PASSWORD 비밀값이 없어요. Settings > Secrets and variables > Actions 에서 먼저 추가해 주세요."
+            exit 1
+          fi
+
+      - name: Prepare folders (first run moves data files)
+        run: |
+          mkdir -p _src
+          for f in latest.json history.json; do
+            if [ -f "$f" ]; then git mv "$f" "_src/$f"; fi
+          done
+          if [ ! -f _src/app.html ]; then cp index.html _src/app.html; fi
+
       - name: Install
         run: |
           pip install playwright beautifulsoup4 lxml
           playwright install --with-deps chromium
+
       - name: Collect
-        run: python ekcm_collector.py
+        working-directory: _src
+        run: python ../ekcm_collector.py
+
+      - name: Build password-protected page
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: |
+          python build.py
+          npx -y staticrypt@3 plain.html -p "$SITE_PASSWORD" --short --remember 30 -d out \
+            --template-title "한우 단가 대시보드" \
+            --template-instructions "비밀번호를 입력해 주세요" \
+            --template-button "열기" \
+            --template-placeholder "비밀번호" \
+            --template-error "비밀번호가 맞지 않아요"
+          test -s out/plain.html
+          cp out/plain.html index.html
+
       - name: Save results
         run: |
           git config user.name "price-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add latest.json history.json
+          git add _src/latest.json _src/history.json _src/app.html index.html
+          git add -u
           git commit -m "daily update $(date +%F)" || echo "no changes"
           git pull --rebase
           git push
+
+      - name: Refresh site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST repos/${{ github.repository }}/pages/builds || true
