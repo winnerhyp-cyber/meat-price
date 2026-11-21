@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 0 * * *"   # 매일 한국시간 오전 9시 (UTC 0시)
   workflow_dispatch:        # 수동 실행 버튼
+    inputs:
+      quick:
+        description: "빠른 시험 (수집을 건너뛰고 화면/비밀번호만 만들기)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -45,6 +50,7 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Collect
+        if: ${{ github.event.inputs.quick != 'true' }}
         working-directory: _src
         run: python ../ekcm_collector.py
 
