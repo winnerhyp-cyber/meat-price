@@ -181,7 +181,7 @@ def import_history(con):
     keep = ["day", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand", "min_all_kg", "max_all_kg"]
     for r in json.load(open("history.json", encoding="utf-8")):
         con.execute("INSERT OR IGNORE INTO price_range (%s) VALUES (%s)" % (
-            ",".join(keep), ",".join(":" + k for k in keep)), r)
+            ",".join(keep), ",".join(":" + k for k in keep)), {k: r.get(k) for k in keep})
     con.commit()
 
 
