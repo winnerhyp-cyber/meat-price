@@ -102,6 +102,10 @@ tr.grp td:first-child{background:var(--chip)}
 .tablewrap td:not(:first-child):last-child{padding-right:44px}
 .so{color:var(--sub);font-size:12px;text-align:center;font-weight:600}
 .tablewrap td.so{padding-right:4px}
+.l .bx i{font-style:normal;font-size:9.5px;color:var(--sub);opacity:.85}
+.l.lb:has(.bx){grid-template-columns:6em 10em}
+.l.nl:has(.bx){grid-template-columns:4.9em 9em}
+@media(max-width:560px){.l.lb:has(.bx){grid-template-columns:5.3em 8.6em!important}.l.nl:has(.bx){grid-template-columns:4.4em 8em!important}}
 </style>
 </head>
 <body>
@@ -125,12 +129,13 @@ const $=s=>document.querySelector(s);
 let ALL=[], DAYS=[], TODAY="", tab="today";
 const BONE=new Set(["우족","사골","꼬리반골","알꼬리","잡뼈","잡육","도가니","스지","마구리","막내장"]);
 const GRP_ORDER=["냉장","냉동","뼈·부산물"];
-const grp=p=>(p.startsWith("냉동")||p==="차돌박이")?"냉동":(BONE.has(p)?"뼈·부산물":"냉장");
-const CAT_ORDER=["한우거세","한우암소","육우거세","육우암소","국내산 돈육"];
-const GRADE_ORDER=["1++","1+","1","2","3","등외"];
+const BONE2=["사골","스지","도가니","꼬리","목뼈","학본","곱창","홍창","깐양","대동맥"];
+const grp=p=>CAT.startsWith("수입냉동")?(BONE2.some(x=>p.startsWith(x))?"뼈·부산물":"냉동"):((p.startsWith("냉동")||p==="차돌박이")?"냉동":(BONE.has(p)?"뼈·부산물":"냉장"));
+const CAT_ORDER=["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육(미국)","수입냉장우육(호주)","수입냉동우육"];
+const GRADE_ORDER=["1++","1+","1","2","3","등외","PR","CAB","CH(SRA)","CH","CH(SS)","SEL","GF","PSA","S","A","YP/GF"];
 let CAT="한우거세", CATS=[];
 let GRADES=["1++","1+","1","2","3"];
-const gradesOf=c=>{const s=new Set(ALL.filter(r=>r.category===c).map(r=>r.grade_f));const g=GRADE_ORDER.filter(x=>s.has(x));return g.length?g:[...s]};
+const gradesOf=c=>{const s=new Set(ALL.filter(r=>r.category===c).map(r=>r.grade_f));return [...GRADE_ORDER.filter(x=>s.has(x)),...[...s].filter(x=>!GRADE_ORDER.includes(x)).sort()]};
 const nm=p=>p==="차돌박이"?"차돌박이(냉동)":p;
 
 async function load(){
@@ -169,8 +174,11 @@ function delta(cur,old){
 function favs(){try{return JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){return[]}}
 function toggleFav(p){try{const f=favs();const i=f.indexOf(p);i<0?f.push(p):f.splice(i,1);localStorage.setItem("fav",JSON.stringify(f))}catch(e){}}
 let MODE="grid", LG="1++", SORT="part";
-const sb=b=>b.replace(/한우$/,"").replace(/대한으로$/,"");
+const sb=b=>b.replace(/한우$/,"").replace(/대한으로$/,"").replace(/\(.*\)$/,"");
 const br=b=>b?`<em title="${b}">${sb(b)}</em>`:"";
+const bx=(r,w)=>{const b=r[w+"_brand"],o=r[w+"_origin"],g=r[w+"_grade"];if(!b)return "";
+  if(!o)return br(b);
+  const x=[o,g].filter(Boolean).join("·");return `<em class="bx" title="${b} ${x}">${sb(b)} <i>${x}</i></em>`};
 const fkey=p=>CAT+"|"+p;
 const star=p=>`<span class="st ${favs().includes(fkey(p))?'on':''}" data-p="${fkey(p)}" title="즐겨찾기">${favs().includes(fkey(p))?'★':'☆'}</span>`;
 
@@ -200,7 +208,7 @@ function viewToday(){
         rows+=`<tr><td class="${p.length>12?'wrapok':''} ${p.length>9?'wrapm':''}">${star(p)} ${nm(p)}</td>`+GRADES.map(gr=>{
           const r=get(TODAY,p,gr); if(!r) return seenPG(p,gr)?`<td class="so">품절</td>`:`<td class="rng" style="color:var(--sub)">-</td>`;
           const o=pd?get(pd,p,gr):null;
-          return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l lb"><b><span class="t">저</span>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div><div class="l lb hi"><b><span class="t">고</span>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td>`}).join("")+"</tr>"});
+          return `<td class="${r.total<=3?'thin':''}" title="${r.total}건"><div class="l lb"><b><span class="t">저</span>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${bx(r,"min")}</div><div class="l lb hi"><b><span class="t">고</span>${won(r.max_kg)}</b>${bx(r,"max")}</div></td>`}).join("")+"</tr>"});
       out=`<div class="tablewrap"><table><thead><tr><th>부위</th>${GRADES.map(g=>`<th>${g}<span class="th-u">(원/Kg)</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="${GRADES.length+1}" class="empty">결과가 없어요</td></tr>`}</tbody></table></div>`;
       $("#nt").textContent="저=Kg당 최저가 · 고=Kg당 최고가 · 옆 글씨는 브랜드 · ※ 는 상품 3개 이하(참고용)"+(pd?" · ▲▼ 전일 대비 최저가":"");
     }else if(MODE==="list"){
@@ -209,7 +217,7 @@ function viewToday(){
       const soldP=ps.filter(p=>!get(TODAY,p,g)&&seenPG(p,g));
       if(SORT==="asc") rs.sort((a,b)=>a.min_kg-b.min_kg); else if(SORT==="desc") rs.sort((a,b)=>b.min_kg-a.min_kg);
       out=`<div class="tablewrap"><table class="tl"><thead><tr><th>부위 (${g})</th><th>최저</th><th>최고</th><th>상품</th></tr></thead><tbody>`+
-        (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${nm(r.part)}</td><td><div class="l nl"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${br(r.min_brand)}</div></td><td><div class="l nl hi"><b>${won(r.max_kg)}</b>${br(r.max_brand)}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")+soldP.map(p=>`<tr><td>${star(p)} ${nm(p)}</td><td colspan="3" class="so">품절</td></tr>`).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
+        (rs.map(r=>{const o=pd?get(pd,r.part,g):null;return `<tr class="${r.total<=3?'thin':''}"><td>${star(r.part)} ${nm(r.part)}</td><td><div class="l nl"><b>${won(r.min_kg)}</b>${delta(r.min_kg,o&&o.min_kg)}${bx(r,"min")}</div></td><td><div class="l nl hi"><b>${won(r.max_kg)}</b>${bx(r,"max")}</div></td><td style="color:var(--sub);font-size:12px">${r.total}건${r.total<=3?" ※":""}</td></tr>`}).join("")+soldP.map(p=>`<tr><td>${star(p)} ${nm(p)}</td><td colspan="3" class="so">품절</td></tr>`).join("")||`<tr><td colspan="4" class="empty">이 등급 데이터가 없어요</td></tr>`)+`</tbody></table></div>`;
       $("#nt").textContent="단위: 원/Kg · 등급을 고르고 정렬을 바꿔보세요. ※ 는 상품 3개 이하(참고용)";
     }else{
       out=`<div class="cards">`+(ps.map(p=>`<div class="cd"><div class="cdh">${star(p)} <b>${nm(p)}</b></div>`+GRADES.map(gr=>{
