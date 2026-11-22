@@ -93,6 +93,10 @@ tr.grp td:not(:first-child){text-align:center}
 .gu{font-size:10px;font-weight:400;color:var(--sub);margin-left:2px}
 .cats{margin:10px 0 0;flex-wrap:wrap;width:fit-content;max-width:100%}
 .cats button{padding:7px 14px}
+th:first-child,td:first-child{position:sticky;left:0;z-index:3;background:var(--card);box-shadow:1px 0 0 var(--line)}
+thead th:first-child{background:var(--chip);z-index:4}
+tr.grp td:first-child{background:var(--chip)}
+.tablewrap table{position:relative}
 </style>
 </head>
 <body>
