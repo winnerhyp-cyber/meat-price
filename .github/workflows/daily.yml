@@ -5,6 +5,14 @@ on:
     - cron: "0 0 * * *"   # 매일 한국시간 오전 9시 (UTC 0시)
   workflow_dispatch:        # 수동 실행 버튼
     inputs:
+      cats:
+        description: "시험용: 수집할 카테고리 (예: 한우암소 / 비우면 전부, 여러 개는 ; 로 구분)"
+        type: string
+        default: ""
+      parts:
+        description: "시험용: 수집할 부위 (예: 안심;등심 / 비우면 전부)"
+        type: string
+        default: ""
       quick:
         description: "빠른 시험 (수집을 건너뛰고 화면/비밀번호만 만들기)"
         type: boolean
@@ -17,7 +25,7 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -52,7 +60,14 @@ jobs:
       - name: Collect
         if: ${{ github.event.inputs.quick != 'true' }}
         working-directory: _src
-        run: python ../ekcm_collector.py
+        env:
+          IN_CATS: ${{ github.event.inputs.cats }}
+          IN_PARTS: ${{ github.event.inputs.parts }}
+        run: |
+          args=()
+          if [ -n "$IN_CATS" ]; then args+=(--cat "$IN_CATS"); fi
+          if [ -n "$IN_PARTS" ]; then args+=(--parts "$IN_PARTS"); fi
+          python ../ekcm_collector.py "${args[@]}"
 
       - name: Build password-protected page
         env:
