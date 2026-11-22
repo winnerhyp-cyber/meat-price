@@ -43,10 +43,10 @@ CATEGORIES = {
     "육우거세": {"url": SUB + "21", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
     "육우암소": {"url": SUB + "22", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
     "국내산 돈육": {"url": SUB + "31", "grades": ["전체"], "nograde": True},   # 돈육은 등급 구분이 없음
-    # 수입육: 부위 × 국가(필터) × 등급(필터, 부위마다 자동 확인). 저장 이름은 "수입냉장우육(미국)" 처럼 국가별로 나뉨
-    "수입냉장우육": {"url": SUB + "41", "grades": "auto", "countries": ["미국", "호주"], "group": "냉장"},
+    # 수입냉장우육: 부위별로만 나눔(국가·등급은 나누지 않고, 최저/최고 상품의 브랜드·원산지·등급을 같이 저장)
+    "수입냉장우육": {"url": SUB + "41", "grades": ["전체"], "nograde": True, "group": "냉장", "countries": ["미국", "호주"]},
     # 수입냉동우육: 부위별로만 나눔(국가·등급은 나누지 않고, 최저/최고 상품의 브랜드·원산지·등급을 같이 저장)
-    "수입냉동우육": {"url": SUB + "42", "grades": ["전체"], "nograde": True, "group": "냉동"},
+    "수입냉동우육": {"url": SUB + "42", "grades": ["전체"], "nograde": True, "group": "냉동", "countries": ["미국", "호주"]},
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
 DELAY = (0.3, 0.8)                  # 조합 사이 대기(초)
@@ -197,7 +197,7 @@ def save_row(con, rec):
 
 
 def _dbcats(cat, cfg):
-    return [f"{cat}({c})" for c in cfg["countries"]] if cfg.get("countries") else [cat]
+    return [cat]
 
 
 CAT_ORDER = [d for c, f in CATEGORIES.items() for d in _dbcats(c, f)]
@@ -527,20 +527,20 @@ def run_category(page, con, day, cat, cfg, only, resume):
                 print(f"  {part}: 등급 버튼이 없어 건너뜀 (품절이거나 화면이 늦게 뜸)")
                 continue
             grades_cfg = labels
-        for country in countries:
-            dbcat = f"{cat}({country})" if country else cat
-            sv = lambda rec, dbcat=dbcat: save_row(con, {**rec, "category": dbcat})
-            todo = [g for g in grades_cfg if (dbcat, part, g) not in done]
-            if not todo:
-                continue
-            for grade in todo:
+        dbcat = cat
+        sv = lambda rec, dbcat=dbcat: save_row(con, {**rec, "category": dbcat})
+        # 수입육: "전체"(필터 없음) 한 줄 + 원산지별 한 줄씩("국가:미국" 처럼 저장)
+        variants = [(None, g) for g in grades_cfg] + [(c, "국가:" + c) for c in (cfg.get("countries") or [])]
+        todo = [(c, g) for c, g in variants if (dbcat, part, g) not in done]
+        if True:
+            for country, grade in todo:
                 tag = f"{dbcat}/{part}/{grade}"
                 try:
                     if country:
                         cs = click_country(page, country)
                         if cs != "OK":
                             print(f"  {part}/{country}: 국가 버튼 없음({cs})")
-                            break
+                            continue
                     st = "OK" if nograde else click_grade(page, grade)
                     if st == "NO_GRADE_ROW":
                         print(f"[실패] {dbcat}/{part}: 등급 버튼이 12초 안에 안 나타남 (이 부위는 건너뜀, 나중에 --resume 으로 재시도)", file=sys.stderr, flush=True)
@@ -563,7 +563,7 @@ def run_category(page, con, day, cat, cfg, only, resume):
                         pass
                     continue
                 try:
-                    if not nograde:
+                    if not nograde or country:
                         clear_filters(page)                      # 다음 조합을 위해 필터 초기화
                 except Exception:
                     pass
