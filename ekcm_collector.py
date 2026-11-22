@@ -43,6 +43,10 @@ CATEGORIES = {
     "육우거세": {"url": SUB + "21", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
     "육우암소": {"url": SUB + "22", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
     "국내산 돈육": {"url": SUB + "31", "grades": ["전체"], "nograde": True},   # 돈육은 등급 구분이 없음
+    # 수입육: 부위 × 국가(필터) × 등급(필터, 부위마다 자동 확인). 저장 이름은 "수입냉장우육(미국)" 처럼 국가별로 나뉨
+    "수입냉장우육": {"url": SUB + "41", "grades": "auto", "countries": ["미국", "호주"], "group": "냉장"},
+    # 수입냉동우육: 부위별로만 나눔(국가·등급은 나누지 않고, 최저/최고 상품의 브랜드·원산지·등급을 같이 저장)
+    "수입냉동우육": {"url": SUB + "42", "grades": ["전체"], "nograde": True, "group": "냉동"},
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
 DELAY = (0.3, 0.8)                  # 조합 사이 대기(초)
@@ -84,6 +88,16 @@ def parse_row(li):
     sale = num(_txt(li, ".pd-price.c-black"))
     if price_kg is None or not name:
         raise ValueError("가격/상품명을 못 읽음")
+    origin = None                                           # 원산지 (수입육): "원산지/등급" 칸의 앞 글자 (예: 호주)
+    for xs in li.select("div.pd-row.xs"):
+        lab = xs.select_one(".label")
+        if lab and "원산지" in lab.get_text():
+            v = xs.select_one(".value")
+            if v:
+                for x in v.select("span, p"):
+                    x.extract()
+                origin = v.get_text(strip=True) or None
+            break
     plant = li.select_one("div.pd-row.lg .value")
     trace = li.select_one("div.pd-row.rg .value > span")
     made = li.select_one("div.pd-row.md .value > p")
@@ -100,6 +114,7 @@ def parse_row(li):
         "made_date": made.get_text(strip=True) if made else None,
         "plant": " ".join(plant.get_text(" ", strip=True).split()) if plant else None,
         "trace_no": trace.get_text(strip=True) if trace else None,
+        "origin": origin,
     }
 
 
@@ -141,9 +156,10 @@ def summarize(rows):
 COLS = ["day", "category", "part", "grade_f", "total",
         "min_kg", "min_goods", "min_brand", "min_grade",      # 최저가 (명품 제외)
         "max_kg", "max_goods", "max_brand", "max_grade",      # 최고가 (명품 제외)
-        "min_all_kg", "max_all_kg"]                           # 참고: 명품 포함 최저/최고
+        "min_all_kg", "max_all_kg",                           # 참고: 명품 포함 최저/최고
+        "min_origin", "max_origin"]                           # 최저/최고 상품의 원산지(수입육)
 TEXT_COLS = {"day", "category", "part", "grade_f", "min_goods", "min_brand", "min_grade",
-             "max_goods", "max_brand", "max_grade"}
+             "max_goods", "max_brand", "max_grade", "min_origin", "max_origin"}
 
 
 def init_db(con):
@@ -180,7 +196,11 @@ def save_row(con, rec):
     con.commit()
 
 
-CAT_ORDER = list(CATEGORIES)
+def _dbcats(cat, cfg):
+    return [f"{cat}({c})" for c in cfg["countries"]] if cfg.get("countries") else [cat]
+
+
+CAT_ORDER = [d for c, f in CATEGORIES.items() for d in _dbcats(c, f)]
 
 
 def _sorted_rows(rows):
@@ -202,7 +222,7 @@ def export_latest(con, day):
 
 
 HIST_KEEP = ["day", "category", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand",
-             "min_all_kg", "max_all_kg"]
+             "min_all_kg", "max_all_kg", "min_grade", "max_grade", "min_origin", "max_origin"]
 
 
 def export_history(con):
@@ -242,8 +262,15 @@ JS_SIG = """() => {
           ready: (total === '0') || lis.length > 0};
 }"""
 
-JS_PARTS = """() => [...document.querySelectorAll('.category-wrap .ctg-item')]
-  .map(e => e.textContent.replace(/\\s+/g, ' ').trim()).filter(Boolean)"""
+JS_PARTS = """(group) => {
+  const gs = [...document.querySelectorAll('.category-wrap .group')];
+  let items = [...document.querySelectorAll('.category-wrap .ctg-item')];
+  if (group && gs.length) {                      // 수입육: 지정한 그룹(냉장/냉동)의 부위만
+    const g = gs.find(x => (((x.querySelector('.subtitle3') || {}).textContent) || '').trim().startsWith(group));
+    items = g ? [...g.querySelectorAll('.ctg-item')] : [];
+  }
+  return items.map(e => e.textContent.replace(/\\s+/g, ' ').trim()).filter(Boolean);
+}"""
 
 JS_FIRST_PART = """() => {
   const nm = el => el.textContent.replace(/\\s+/g, ' ').trim();
@@ -254,10 +281,16 @@ JS_FIRST_PART = """() => {
   return nm(el);
 }"""
 
-JS_CLICK_PART = """(name) => {
+JS_CLICK_PART = """([name, group]) => {
   const nm = el => el.textContent.replace(/\\s+/g, ' ').trim();
   const base = n => n.replace(/\\s*\\([\\d,]+\\)\\s*$/, '');
-  const el = [...document.querySelectorAll('.category-wrap .ctg-item')].find(e => base(nm(e)) === name);
+  const gs = [...document.querySelectorAll('.category-wrap .group')];
+  let items = [...document.querySelectorAll('.category-wrap .ctg-item')];
+  if (group && gs.length) {
+    const g = gs.find(x => (((x.querySelector('.subtitle3') || {}).textContent) || '').trim().startsWith(group));
+    items = g ? [...g.querySelectorAll('.ctg-item')] : [];
+  }
+  const el = items.find(e => base(nm(e)) === name);
   if (!el) return null;
   const label = nm(el);
   (el.querySelector('.category') || el).click();
@@ -308,6 +341,42 @@ JS_CLICK_SORT = """(label) => {
   return true;
 }"""
 
+JS_CLICK_COUNTRY = """async (country) => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const clean = x => x.textContent.replace(/품절/g, '').trim();
+  const findRow = () => [...document.querySelectorAll('.filter-group dl')]
+      .find(d => (d.querySelector('dt') || {}).textContent.trim().startsWith('국가'));
+  for (let i = 0; i < 4; i++) {
+    const r = findRow();
+    const btn = r && [...r.querySelectorAll('button')].find(b => clean(b) === country);
+    if (!btn) { await sleep(600); if (i === 3) return 'NO_BUTTON'; continue; }
+    btn.click();
+    await sleep(700);
+    const c = r.querySelector('dt .count');
+    if (c && c.textContent.trim() === '1') return 'OK';
+    await sleep(600);
+  }
+  return 'CLICK_FAILED';
+}"""
+
+JS_GRADE_LABELS = """async () => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const clean = x => x.textContent.replace(/품절/g, '').trim();
+  const findRow = () => [...document.querySelectorAll('.filter-group dl')]
+      .find(d => (d.querySelector('dt') || {}).textContent.trim().startsWith('등급'));
+  const t0 = Date.now();
+  while (Date.now() - t0 < 12000) {
+    const row = findRow();
+    const bs = row ? [...row.querySelectorAll('button')] : [];
+    if (bs.length) {
+      return bs.filter(b => { const s = b.querySelector('.soldout-badge'); return !(s && s.style.display !== 'none'); })
+               .map(clean).filter(Boolean);
+    }
+    await sleep(250);
+  }
+  return null;
+}"""
+
 JS_CLEAR = """() => {
   const b = [...document.querySelectorAll('button')]
       .find(x => x.textContent.trim() === '전체해제' && x.offsetParent !== null);
@@ -338,10 +407,10 @@ def wait_change(page, prev, timeout=8.0):
     return False
 
 
-def click_part(page, name):
+def click_part(page, name, group=None):
     """부위 버튼을 눌러 목록을 바꾸고, 사이트에 표시된 상품 수를 돌려줌"""
     prev = signature(page)
-    label = page.evaluate(JS_CLICK_PART, name)
+    label = page.evaluate(JS_CLICK_PART, [name, group])
     if not label:
         raise RuntimeError(f"부위 버튼을 못 찾음: {name}")
     wait_change(page, prev, timeout=6.0)
@@ -397,10 +466,10 @@ def enter_list(page, url):
     settle(page)
 
 
-def discover_parts(page):
+def discover_parts(page, group=None):
     """화면의 부위 버튼에서 (이름) 목록을 읽음. 상품 0건이거나 중복인 부위는 제외"""
     seen, out = set(), []
-    for lab in page.evaluate(JS_PARTS):
+    for lab in page.evaluate(JS_PARTS, group):
         m = re.match(r"^(.*?)\s*\(([\d,]+)\)\s*$", lab)
         if not m:
             continue
@@ -412,79 +481,112 @@ def discover_parts(page):
     return out
 
 
+def get_grade_labels(page):
+    """이 부위의 등급 버튼 이름들(재고 있는 것만). 못 찾으면 None"""
+    return page.evaluate(JS_GRADE_LABELS)
+
+
+def click_country(page, country):
+    prev = signature(page)
+    r = page.evaluate(JS_CLICK_COUNTRY, country)
+    if r == "OK":
+        wait_change(page, prev)
+    return r
+
+
 def run_category(page, con, day, cat, cfg, only, resume):
-    grades = cfg["grades"]
+    countries = cfg.get("countries") or [None]
+    group = cfg.get("group")
+    nograde = cfg.get("nograde")
     done = set()
     if resume:
-        done = {(r[0], r[1]) for r in con.execute(
-            "SELECT part, grade_f FROM price_range WHERE day=? AND category=?", (day, cat))}
+        names = _dbcats(cat, cfg)
+        done = {(r[0], r[1], r[2]) for r in con.execute(
+            "SELECT category, part, grade_f FROM price_range WHERE day=? AND category IN (%s)" % ",".join("?" * len(names)),
+            [day] + names)}
         print(f"이어서 수집: {cat} 오늘 이미 받은 {len(done)}건은 건너뜁니다")
     print(f"\n===== {cat} =====", flush=True)
     enter_list(page, cfg["url"])
-    parts = [p for p in discover_parts(page) if (not only or p in only)]
+    parts = [p for p in discover_parts(page, group) if (not only or p in only)]
     print(f"{cat}: 수집할 부위 {len(parts)}개", flush=True)
-    sv = lambda rec: save_row(con, {**rec, "category": cat})
     for part in parts:
-        todo = [g for g in grades if (part, g) not in done]
-        if not todo:
-            continue
         print(f"[부위] {part}", flush=True)
         try:
-            expect = click_part(page, part)
+            expect = click_part(page, part, group)
             shown = page.evaluate("() => (document.querySelector('.list-wrap .total')||{}).textContent")
-            if expect is not None and str(expect) != (shown or "").replace(",", ""):
+            if expect is not None and not group and str(expect) != (shown or "").replace(",", ""):
                 print(f"[주의] {part}: 사이트 표시 {expect}건 / 목록 {shown}건 (부위 전환 확인 필요)")
         except Exception as e:
             print(f"[실패] {cat}/{part}: {str(e)[:200]}", file=sys.stderr, flush=True)
             dump_debug(page, f"part_{cat}_{part}")
             continue
-        for grade in todo:
-            try:
-                st = "OK" if cfg.get("nograde") else click_grade(page, grade)
-                if st == "NO_GRADE_ROW":
-                    print(f"[실패] {cat}/{part}: 등급 버튼이 12초 안에 안 나타남 (이 부위는 건너뜀, 나중에 --resume 으로 재시도)", file=sys.stderr, flush=True)
-                    dump_debug(page, f"{cat}_{part}_nogradeRow")
-                    break
-                if st.startswith("NO_BUTTON"):
-                    print(f"  {part}/{grade}: 해당 등급 없음")
-                    sv({"day": day, "part": part, "grade_f": grade, "total": 0})
-                    continue
-                if st != "OK":
-                    raise RuntimeError(f"등급 선택이 적용되지 않음: {st}")
-                total, low_rows = pick(page, SORT_LOW)
-                _, high_rows = pick(page, SORT_HIGH)
-            except Exception as e:                              # 한 조합 실패해도 계속
-                print(f"[실패] {cat}/{part}/{grade}: {str(e)[:200]}", file=sys.stderr, flush=True)
-                dump_debug(page, f"{cat}_{part}_{grade}".replace("+", "p"))
+        grades_cfg = cfg["grades"]
+        if grades_cfg == "auto":
+            labels = get_grade_labels(page)
+            if not labels:
+                print(f"  {part}: 등급 버튼이 없어 건너뜀 (품절이거나 화면이 늦게 뜸)")
+                continue
+            grades_cfg = labels
+        for country in countries:
+            dbcat = f"{cat}({country})" if country else cat
+            sv = lambda rec, dbcat=dbcat: save_row(con, {**rec, "category": dbcat})
+            todo = [g for g in grades_cfg if (dbcat, part, g) not in done]
+            if not todo:
+                continue
+            for grade in todo:
+                tag = f"{dbcat}/{part}/{grade}"
                 try:
-                    clear_filters(page)
+                    if country:
+                        cs = click_country(page, country)
+                        if cs != "OK":
+                            print(f"  {part}/{country}: 국가 버튼 없음({cs})")
+                            break
+                    st = "OK" if nograde else click_grade(page, grade)
+                    if st == "NO_GRADE_ROW":
+                        print(f"[실패] {dbcat}/{part}: 등급 버튼이 12초 안에 안 나타남 (이 부위는 건너뜀, 나중에 --resume 으로 재시도)", file=sys.stderr, flush=True)
+                        dump_debug(page, f"{dbcat}_{part}_nogradeRow")
+                        break
+                    if st.startswith("NO_BUTTON"):
+                        print(f"  {part}/{grade}: 해당 등급 없음")
+                        sv({"day": day, "part": part, "grade_f": grade, "total": 0})
+                        continue
+                    if st != "OK":
+                        raise RuntimeError(f"등급 선택이 적용되지 않음: {st}")
+                    total, low_rows = pick(page, SORT_LOW)
+                    _, high_rows = pick(page, SORT_HIGH)
+                except Exception as e:                          # 한 조합 실패해도 계속
+                    print(f"[실패] {tag}: {str(e)[:200]}", file=sys.stderr, flush=True)
+                    dump_debug(page, tag.replace("+", "p").replace("/", "_"))
+                    try:
+                        clear_filters(page)
+                    except Exception:
+                        pass
+                    continue
+                try:
+                    if not nograde:
+                        clear_filters(page)                      # 다음 조합을 위해 필터 초기화
                 except Exception:
                     pass
-                continue
-            try:
-                if not cfg.get("nograde"):
-                    clear_filters(page)                          # 다음 등급을 위해 필터 초기화
-            except Exception:
-                pass
-            lo_all, lo = top_pair(low_rows)          # (명품 포함 1위, 명품 제외 1위)
-            hi_all, hi = top_pair(high_rows)
-            if not lo_all or not hi_all or not total:
-                print(f"  {part}/{grade}: 상품 없음")
-                sv({"day": day, "part": part, "grade_f": grade, "total": 0})
-                continue
-            if not lo or not hi:
-                print(f"[주의] {part}/{grade}: 맨 위 30건이 모두 명품이라 일반 상품 가격을 못 찾음 (건너뜀)")
-                continue
-            if lo["price_kg"] > hi["price_kg"]:
-                print(f"[주의] {part}/{grade}: 정렬이 반대로 적용됨(최저>최고). 확인 필요")
-            rec = {"day": day, "part": part, "grade_f": grade, "total": total,
-                   "min_kg": lo["price_kg"], "min_goods": lo["goods_no"], "min_brand": lo["brand"], "min_grade": lo["grade"],
-                   "max_kg": hi["price_kg"], "max_goods": hi["goods_no"], "max_brand": hi["brand"], "max_grade": hi["grade"],
-                   "min_all_kg": lo_all["price_kg"], "max_all_kg": hi_all["price_kg"]}
-            sv(rec)
-            note = f"  (명품 포함 최고 {hi_all['price_kg']:,})" if hi_all["premium"] else ""
-            print(f"  {part}/{grade}: 최저 {lo['price_kg']:,} ({lo['brand']}) / 최고 {hi['price_kg']:,} ({hi['brand']})  [{total}건]{note}", flush=True)
-            time.sleep(random.uniform(*DELAY))
+                lo_all, lo = top_pair(low_rows)      # (명품 포함 1위, 명품 제외 1위)
+                hi_all, hi = top_pair(high_rows)
+                if not lo_all or not hi_all or not total:
+                    print(f"  {dbcat}/{part}/{grade}: 상품 없음")
+                    sv({"day": day, "part": part, "grade_f": grade, "total": 0})
+                    continue
+                if not lo or not hi:
+                    print(f"[주의] {part}/{grade}: 맨 위 30건이 모두 명품이라 일반 상품 가격을 못 찾음 (건너뜀)")
+                    continue
+                if lo["price_kg"] > hi["price_kg"]:
+                    print(f"[주의] {part}/{grade}: 정렬이 반대로 적용됨(최저>최고). 확인 필요")
+                rec = {"day": day, "part": part, "grade_f": grade, "total": total,
+                       "min_kg": lo["price_kg"], "min_goods": lo["goods_no"], "min_brand": lo["brand"], "min_grade": lo["grade"],
+                       "max_kg": hi["price_kg"], "max_goods": hi["goods_no"], "max_brand": hi["brand"], "max_grade": hi["grade"],
+                       "min_all_kg": lo_all["price_kg"], "max_all_kg": hi_all["price_kg"],
+                       "min_origin": lo.get("origin"), "max_origin": hi.get("origin")}
+                sv(rec)
+                note = f"  (명품 포함 최고 {hi_all['price_kg']:,})" if hi_all["premium"] else ""
+                print(f"  {dbcat}/{part}/{grade}: 최저 {lo['price_kg']:,} ({lo['brand']}) / 최고 {hi['price_kg']:,} ({hi['brand']})  [{total}건]{note}", flush=True)
+                time.sleep(random.uniform(*DELAY))
         export_latest(con, day)                                  # 부위마다 중간 저장
 
 
