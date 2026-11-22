@@ -42,6 +42,7 @@ CATEGORIES = {
     "한우암소": {"url": SUB + "14", "grades": ["1++", "1+", "1", "2", "3"]},
     "육우거세": {"url": SUB + "21", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
     "육우암소": {"url": SUB + "22", "grades": ["1++", "1+", "1", "2", "3", "등외"]},
+    "국내산돈육": {"url": SUB + "31", "grades": ["전체"], "nograde": True},   # 돈육은 등급 구분이 없음
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
 DELAY = (0.3, 0.8)                  # 조합 사이 대기(초)
@@ -439,7 +440,7 @@ def run_category(page, con, day, cat, cfg, only, resume):
             continue
         for grade in todo:
             try:
-                st = click_grade(page, grade)
+                st = "OK" if cfg.get("nograde") else click_grade(page, grade)
                 if st == "NO_GRADE_ROW":
                     print(f"[실패] {cat}/{part}: 등급 버튼이 12초 안에 안 나타남 (이 부위는 건너뜀, 나중에 --resume 으로 재시도)", file=sys.stderr, flush=True)
                     dump_debug(page, f"{cat}_{part}_nogradeRow")
@@ -461,7 +462,8 @@ def run_category(page, con, day, cat, cfg, only, resume):
                     pass
                 continue
             try:
-                clear_filters(page)                              # 다음 등급을 위해 필터 초기화
+                if not cfg.get("nograde"):
+                    clear_filters(page)                          # 다음 등급을 위해 필터 초기화
             except Exception:
                 pass
             lo_all, lo = top_pair(low_rows)          # (명품 포함 1위, 명품 제외 1위)
