@@ -2,7 +2,7 @@ name: daily-collect
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # 매일 한국시간 오전 9시 (UTC 0시)
+    - cron: "0 20 * * *"  # 매일 한국시간 오전 5시 (UTC 전날 20시)
   workflow_dispatch:        # 수동 실행 버튼
     inputs:
       cats:
@@ -17,6 +17,9 @@ on:
         description: "빠른 시험 (수집을 건너뛰고 화면/비밀번호만 만들기)"
         type: boolean
         default: false
+
+env:
+  TZ: Asia/Seoul   # 날짜를 한국 기준으로 기록
 
 permissions:
   contents: write
