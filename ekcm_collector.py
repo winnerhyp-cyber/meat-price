@@ -46,6 +46,9 @@ CATEGORIES = {
     # 수입냉장우육: 부위별로만 나눔(국가·등급은 나누지 않고, 최저/최고 상품의 브랜드·원산지·등급을 같이 저장)
     "수입냉장우육": {"url": SUB + "41", "grades": ["전체"], "nograde": True, "group": "냉장", "countries": ["미국", "호주"]},
     # 수입냉동우육: 부위별로만 나눔(국가·등급은 나누지 않고, 최저/최고 상품의 브랜드·원산지·등급을 같이 저장)
+    # 수입돈육: 우육과 같은 방식. 국가 목록은 부위마다 화면의 "국가" 필터에서 자동으로 읽음(그 부위에 있는 나라만 나옴)
+    "수입냉장돈육": {"url": SUB + "51", "grades": ["전체"], "nograde": True, "group": "냉장", "countries": "auto"},
+    "수입냉동돈육": {"url": SUB + "52", "grades": ["전체"], "nograde": True, "group": "냉동", "countries": "auto"},
     "수입냉동우육": {"url": SUB + "42", "grades": ["전체"], "nograde": True, "group": "냉동", "countries": ["미국", "호주"]},
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
@@ -359,6 +362,20 @@ JS_CLICK_COUNTRY = """async (country) => {
   return 'CLICK_FAILED';
 }"""
 
+JS_COUNTRY_LABELS = """async () => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const clean = x => x.textContent.replace(/품절/g, '').trim();
+  const t0 = Date.now();
+  while (Date.now() - t0 < 8000) {
+    const row = [...document.querySelectorAll('.filter-group dl')]
+        .find(d => (d.querySelector('dt') || {}).textContent.trim().startsWith('국가'));
+    const bs = row ? [...row.querySelectorAll('button')] : [];
+    if (bs.length) return bs.map(clean).filter(Boolean);
+    await sleep(250);
+  }
+  return [];
+}"""
+
 JS_GRADE_LABELS = """async () => {
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const clean = x => x.textContent.replace(/품절/g, '').trim();
@@ -530,7 +547,11 @@ def run_category(page, con, day, cat, cfg, only, resume):
         dbcat = cat
         sv = lambda rec, dbcat=dbcat: save_row(con, {**rec, "category": dbcat})
         # 수입육: "전체"(필터 없음) 한 줄 + 원산지별 한 줄씩("국가:미국" 처럼 저장)
-        variants = [(None, g) for g in grades_cfg] + [(c, "국가:" + c) for c in (cfg.get("countries") or [])]
+        ctry = cfg.get("countries") or []
+        if ctry == "auto":
+            ctry = page.evaluate(JS_COUNTRY_LABELS) or []
+            print(f"  {part}: 국가 {ctry}")
+        variants = [(None, g) for g in grades_cfg] + [(c, "국가:" + c) for c in ctry]
         todo = [(c, g) for c, g in variants if (dbcat, part, g) not in done]
         if True:
             for country, grade in todo:
