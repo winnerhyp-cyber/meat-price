@@ -35,13 +35,13 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .ct-h .more{margin-left:auto;font-size:13px;color:var(--sub);font-weight:600}
 .card.ct-t{padding:0;overflow:hidden}
 .ctb{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
-.ctb col.c1{width:37%}.ctb col.c2{width:23%}.ctb col.c3{width:21%}.ctb col.c4{width:19%}
+.ctb col.c1{width:29%}.ctb col.c2{width:27%}.ctb col.c3{width:26%}.ctb col.c4{width:18%}
 .ctb th{font-size:11.5px;color:var(--mute);font-weight:700;text-align:right;padding:8px 10px;background:var(--chip);white-space:nowrap}
 .ctb th:first-child{text-align:left}
 .ctb td{padding:7px 10px;border-top:1px solid var(--line);text-align:right;vertical-align:middle;white-space:nowrap}
 .ctb tbody tr:nth-child(even):not(.gr) td{background:color-mix(in srgb,var(--chip) 45%,transparent)}
 .ctb td.n{text-align:left;white-space:normal;word-break:break-word;line-height:1.3}.ctb td.n .pl{font-weight:700;font-size:14px;text-align:left}
-.ctb td.mn b{font-size:15px;font-weight:800}.ctb td.mn em{display:block;font-style:normal;font-size:10.5px;color:var(--mute);font-weight:600;line-height:1.1}
+.ctb td.mn b{font-size:15px;font-weight:800}.ctb td.mn em,.ctb td.mx em{display:block;font-style:normal;font-size:10.5px;color:var(--mute);font-weight:600;line-height:1.25;white-space:normal;word-break:keep-all;margin-top:1px}
 .ctb td.mx{color:var(--sub);font-size:13px}.ctb td.w .pb{font-size:11px;padding:2px 5px;white-space:nowrap}
 .ctb tr.gr td{text-align:left;font-size:11.5px;font-weight:800;color:var(--sub);background:var(--bg);padding:5px 10px}
 @media(max-width:430px){.ctb td,.ctb th{padding:7px 6px}.ctb td.mn b{font-size:14px}.ctb td.mx{font-size:12px}.ctb td.n .pl{font-size:13.5px}}
@@ -913,8 +913,9 @@ function viewCats(v){
         if(!rs.length){rows+=`<tr><td class="n"><button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}">${esc(nm(p))}</button></td><td colspan="3"><span class="so">품절</span></td></tr>`;return}
         const lo=rs.reduce((a,b)=>b.min_kg<a.min_kg?b:a),hi=rs.reduce((a,b)=>b.max_kg>a.max_kg?b:a);
         const o=pmin(c,x.prev,p);const pc=o&&o.min_kg?pctOf(lo.min_kg,o.min_kg):null;
-        const gl=lo.grade_f!=="전체"?lo.grade_f:"";
-        rows+=`<tr><td class="n"><button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn"><b>${won(lo.min_kg)}</b>${gl?`<em>${esc(gl)}</em>`:""}</td><td class="mx">${won(hi.max_kg)}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
+        const t=(r,w)=>esc([r.grade_f!=="전체"&&!r[w+"_grade"]?r.grade_f:"",brandTxt(r,w)].filter(Boolean).join(" · "));
+        const tl=t(lo,"min"),th=t(hi,"max");
+        rows+=`<tr><td class="n"><button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn"><b>${won(lo.min_kg)}</b>${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
       html+=`<section class="ct-sec" style="--c:${meta(c).c}"><div class="ct-h"><a href="${link(c)}"><span class="ico">${meta(c).e}</span>${esc(c)}</a><span class="d">${x.today.slice(5).replace("-","/")} · ${ps.length}개 부위</span>${x.avg!=null?`<span class="av">${CL(x)} 평균 ${badge(x.avg)}</span>`:""}<a class="more" href="${link(c)}">등급별 ›</a></div>
         <div class="card ct-t"><table class="ctb"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>부위</th><th>최저 (원/Kg)</th><th>최고</th><th>${x.wkx?"전주 대비":"변동"}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
     }
