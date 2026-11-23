@@ -1,0 +1,16 @@
+{
+  "name": "동원 금천미트 도매 단가표",
+  "short_name": "단가표",
+  "description": "금천미트 부위별 Kg당 도매 단가와 변동",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f2ee",
+  "theme_color": "#8b2e2e",
+  "lang": "ko",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

@@ -1,6 +1,6 @@
 # 매일 자동 실행 때 쓰는 파일: 최신 데이터를 화면에 넣어서 plain.html 을 만들어요.
 # (이 뒤에 staticrypt 가 plain.html 을 비밀번호로 암호화해서 index.html 이 됩니다)
-import json, re
+import json, re, time
 
 KEEP_DAYS = 30   # 화면에 넣는 최근 일수 (전체 기록은 _src/history.json 에 계속 쌓여요)
 
@@ -17,8 +17,10 @@ last = days[-1] if days else None
 SLIM = ["day", "category", "part", "grade_f", "total", "min_kg", "max_kg"]      # 지난 날짜는 용량 줄이려고 핵심 열만
 hist = [r if r["day"] == last else {k: r.get(k) for k in SLIM} for r in hist]
 
-src = re.sub(r"<script>window\.EMBED=.*?;</script>\n?", "", src, flags=re.S)
-data = "<script>window.EMBED=%s;window.EMBED_HIST=%s;</script>\n" % (dump(latest), dump(hist))
+src = re.sub(r"<script>window\.EMBED=.*?</script>\n?", "", src, flags=re.S)
+ver = time.strftime("%Y%m%d%H%M%S")                                  # 새 단가 알림용 버전 표시
+json.dump({"v": ver, "day": last}, open("version.json", "w"))
+data = "<script>window.EMBED=%s;window.EMBED_HIST=%s;window.DATA_VER=%s;</script>\n" % (dump(latest), dump(hist), dump(ver))
 marker = "<script>\n"          # 화면 코드가 시작하는 곳 바로 앞에 데이터를 넣어요
 assert marker in src, "app.html 에서 삽입 위치를 못 찾았어요"
 src = src.replace(marker, data + marker, 1)
