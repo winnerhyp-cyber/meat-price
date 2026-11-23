@@ -26,6 +26,38 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
+/* ── 공지 · 관리자 ── */
+.ntc{display:flex;gap:10px;align-items:flex-start;background:#fff7e0;border:1px solid #f0dca0;color:#5a4610;border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:14.5px}
+.ntc p{margin:0;flex:1;line-height:1.55}.ntc button{border:0;background:transparent;font-size:16px;color:inherit;opacity:.6;padding:0 2px}
+@media (prefers-color-scheme:dark){.ntc{background:#3a3220;border-color:#5a4c28;color:#f3e2b0}}
+footer.ft .adm-l{display:inline-block;margin-top:6px;font-size:11px;color:var(--mute);opacity:.55}
+.adm .g-st{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+.adm .g-st .ast:last-child{grid-column:1/-1}@media(min-width:760px){.adm .g-st{grid-template-columns:repeat(5,1fr)}.adm .g-st .ast:last-child{grid-column:auto}}
+@media(max-width:599px){.adm .ct small{display:none}}
+.adm .ast{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:14px 16px}
+.adm .ast .l{font-size:12.5px;color:var(--sub);font-weight:600}.adm .ast .n{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.adm .ast .s{font-size:12px;color:var(--mute)}.adm .ast .s .u{color:var(--up)}.adm .ast .s .d{color:var(--dn)}
+.adm .g2{display:grid;gap:14px;grid-template-columns:1fr}@media(min-width:900px){.adm .g2{grid-template-columns:1fr 1fr}}
+.adm .ct{font-size:15px;font-weight:800;margin:0 0 12px;display:flex;align-items:center;gap:8px}.adm .ct small{font-weight:600;color:var(--mute);font-size:12px;margin-left:auto}
+.bar-row{display:grid;grid-template-columns:88px 1fr 70px;align-items:center;gap:10px;margin:7px 0;font-size:13.5px}
+.bar-row .bl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.bar-track{height:12px;background:var(--chip);border-radius:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--acc),color-mix(in srgb,var(--acc) 45%,#f0b37e));min-width:3px}
+.bval{text-align:right;color:var(--sub);font-size:12.5px;white-space:nowrap}.bval b{color:var(--ink);font-size:13.5px}
+.barv{display:flex;align-items:flex-end;gap:4px;height:170px;padding-top:18px;border-bottom:1px solid var(--line)}
+.barv .c{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;min-width:0}
+.barv .c i{display:block;width:100%;max-width:26px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#f0b37e),var(--acc))}
+.barv .c i.p{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:color-mix(in srgb,var(--acc) 18%,transparent)}
+.barv .c em{position:absolute;font-style:normal;font-size:10.5px;color:var(--sub);white-space:nowrap}
+.barv-x{display:flex;gap:4px;margin-top:5px}.barv-x span{flex:1;text-align:center;font-size:10.5px;color:var(--mute);min-width:0;overflow:hidden;white-space:nowrap}
+.alg{display:flex;gap:12px;font-size:12px;color:var(--sub);margin-top:8px}.alg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.adm textarea{width:100%;min-height:84px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card);resize:vertical;font:inherit}
+.adm .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.adm .cmi{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.adm .cmi:first-child{border-top:0}
+.adm .cmi .tx{flex:1;min-width:0;word-break:break-all}.adm .cmi .m{font-size:12px;color:var(--mute)}
+.adm .uid{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--chip);padding:2px 6px;border-radius:6px;word-break:break-all}
+@media print{.ntc,footer.ft .adm-l{display:none!important}}
+
 /* ── layout ── */
 .side{display:none}
 .main{min-width:0;padding:14px 14px calc(84px + env(safe-area-inset-bottom))}
@@ -364,7 +396,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
   </aside>
 
   <main class="main"><div class="wrap">
-    <div id="nb"></div>
+    <div id="nb"></div><div id="ntc"></div>
     <header class="top">
       <h1 class="brand"><img class="lk" src="data:image/webp;base64,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" alt="금천미트"><span>동원 금천미트 도매 단가표</span><img class="ld" src="data:image/webp;base64,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" alt="동원홈푸드"></h1>
       <div class="gsearch"><input id="gq" class="inp" type="search" placeholder="부위 검색 (예: 안심, 삼겹, 갈비)" autocomplete="off"><div class="sr" id="gqr"></div></div>
@@ -381,6 +413,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
     <footer class="ft">
       만든이: 이현용 매니저 / 문의: 010-3371-8953
       <span class="cp">금천미트 가입 시 가입경로상세 - 이현용 기입 시 쿠폰 증정</span>
+      <a class="adm-l" href="#/admin">관리</a>
     </footer>
   </div></main>
 
@@ -407,50 +440,98 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
 
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-// ── 구글 로그인 · 댓글 · 방문자 수 (Firebase) ──
+// ── 구글 로그인 · 댓글 · 방문 통계 · 공지 · 관리자 (Firebase) ──
 const FB={apiKey:"AIzaSyDqiVIOf4OBpdY9VgHsJbBnNAgcCTHTDTo",authDomain:"meat-price.firebaseapp.com",projectId:"meat-price",storageBucket:"meat-price.firebasestorage.app",messagingSenderId:"495904741333",appId:"1:495904741333:web:73d484c90719d1c0150f5c"};
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const INAPP=/KAKAOTALK|NAVER\(inapp|; wv\)|Line\/|Instagram|FBAN|FBAV|DaumApps/i.test(navigator.userAgent);
+const UA=navigator.userAgent;
+const INAPP=/KAKAOTALK|NAVER\(inapp|; wv\)|Line\/|Instagram|FBAN|FBAV|DaumApps/i.test(UA);
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const SS={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
+const KDAY=(o=0)=>new Date(Date.now()+9*3600e3-o*864e5).toISOString().slice(0,10);
+// 기기 정보 (이름·연락처 없이 종류만)
+const ENV=(()=>{
+  const os=/Android/i.test(UA)?"Android":/iPhone|iPad|iPod/i.test(UA)||(/Macintosh/.test(UA)&&navigator.maxTouchPoints>1)?"iOS":/Windows/i.test(UA)?"Windows":/Macintosh/i.test(UA)?"Mac":/Linux|CrOS/i.test(UA)?"Linux":"기타";
+  const br=/KAKAOTALK/i.test(UA)?"카카오톡":/NAVER/i.test(UA)?"네이버앱":/Instagram|FBAN|FBAV/i.test(UA)?"SNS앱":/SamsungBrowser/i.test(UA)?"삼성인터넷":/Edg\//.test(UA)?"Edge":/Whale/i.test(UA)?"웨일":/Firefox|FxiOS/i.test(UA)?"Firefox":/CriOS|Chrome/i.test(UA)?"Chrome":/Safari/i.test(UA)?"Safari":"기타";
+  const w=Math.min(screen.width,screen.height);
+  const dev=/iPad|Tablet/i.test(UA)||(/Android/i.test(UA)&&!/Mobile/i.test(UA))||(os==="iOS"&&!/iPhone|iPod/.test(UA))?"태블릿":/Mobi|iPhone|Android/i.test(UA)||w<600?"휴대폰":"PC";
+  const r=document.referrer||"";let src="직접 접속";
+  if(/KAKAOTALK/i.test(UA)||/kakao/i.test(r))src="카카오톡";else if(/NAVER/i.test(UA)||/naver/i.test(r))src="네이버";
+  else if(/google|daum|bing/i.test(r))src="검색";else if(r&&!r.includes(location.host))src="다른 사이트";
+  if(matchMedia("(display-mode: standalone)").matches||navigator.standalone)src="설치한 앱";
+  return {os,br,dev,src};
+})();
+// 화면 이동 기록: Firebase 준비 전에 생긴 것은 모아뒀다가 보냄
+const TQ=[];let TF=null;
+window.track=(r,c)=>{const k="pg:"+r+(c?":"+c:"");if(SS.get(k))return;SS.set(k,"1");TF?TF(r,c):TQ.push([r,c])};
+let FBres;window.FBP=new Promise(r=>FBres=r);
+
 async function social(){
   let M;
   try{
     const V="10.12.2",U="https://www.gstatic.com/firebasejs/"+V+"/";
     const [app,auth,fs]=await Promise.all([import(U+"firebase-app.js"),import(U+"firebase-auth.js"),import(U+"firebase-firestore.js")]);
     M={app,auth,fs};
-  }catch(e){return}                                  // 외부 서비스에 연결 못 하면 조용히 숨김
+  }catch(e){FBres(null);return}                       // 외부 서비스에 연결 못 하면 조용히 숨김
   const {initializeApp}=M.app;
   const {getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,signOut}=M.auth;
-  const {getFirestore,collection,doc,setDoc,getDocs,query,where,orderBy,limit,addDoc,deleteDoc,serverTimestamp,getCountFromServer}=M.fs;
+  const {getFirestore,collection,doc,setDoc,getDoc,getDocs,query,where,orderBy,limit,addDoc,deleteDoc,serverTimestamp,getCountFromServer,increment}=M.fs;
   const app=initializeApp(FB), auth=getAuth(app), db=getFirestore(app);
-  const day=new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
+  const day=KDAY();
+  const ctx={M,db,auth,user:null,admin:false,owner:null,ENV,day};
 
-  // 방문자 수: 방문자마다 무작위 번호를 한 번만 기록(이름·연락처는 저장하지 않음)
+  // 방문 기록: 방문자마다 무작위 번호 한 번 + 날짜별 합계(기기·브라우저·시간대)
   let vid=LS.get("vid");
   if(!vid){vid=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());LS.set("vid",vid)}
-  try{ if(LS.get("vsent")!=="1"){await setDoc(doc(db,"visitors",vid),{t:serverTimestamp()});LS.set("vsent","1")} }catch(e){}
-  try{ if(LS.get("dsent")!==day){await setDoc(doc(db,"daily",day+"_"+vid),{day,t:serverTimestamp()});LS.set("dsent",day)} }catch(e){}
+  const sref=doc(db,"stats_daily",day);
+  try{ if(LS.get("vsent")!=="1"){await setDoc(doc(db,"visitors",vid),{t:serverTimestamp()});LS.set("vsent","1");setDoc(sref,{nv:increment(1)},{merge:true}).catch(()=>{})} }catch(e){}
+  try{
+    const hr="h"+String(new Date(Date.now()+9*3600e3).getUTCHours()).padStart(2,"0");
+    const up={pv:increment(1),hr:{[hr]:increment(1)}};
+    if(LS.get("dsent")!==day){
+      await setDoc(doc(db,"daily",day+"_"+vid),{day,t:serverTimestamp()});LS.set("dsent",day);
+      Object.assign(up,{v:increment(1),os:{[ENV.os]:increment(1)},br:{[ENV.br]:increment(1)},dev:{[ENV.dev]:increment(1)},src:{[ENV.src]:increment(1)}});
+    }
+    if(!SS.get("pvs")){SS.set("pvs","1");await setDoc(sref,up,{merge:true})}
+  }catch(e){}
+  TF=(r,c)=>{const up={pg:{[r]:increment(1)}};if(r==="c"&&c)up.cv={[c]:increment(1)};setDoc(sref,up,{merge:true}).catch(()=>{})};
+  TQ.splice(0).forEach(a=>TF(...a));
   try{
     const [t,d]=await Promise.all([getCountFromServer(collection(db,"visitors")),getCountFromServer(query(collection(db,"daily"),where("day","==",day)))]);
     $("#vt").textContent=t.data().count.toLocaleString(); $("#vd").textContent=d.data().count.toLocaleString(); $("#vis").style.display="";
   }catch(e){}
 
+  // 공지
+  ctx.loadNotice=async()=>{
+    try{const s=await getDoc(doc(db,"notice","main"));const n=s.exists()?s.data():null;
+      const el=$("#ntc");if(!el)return n;
+      if(n&&n.text&&n.on!==false&&LS.get("ntcX")!==String(n.v||"")){
+        el.innerHTML=`<div class="ntc"><span>📢</span><p>${esc(n.text).replace(/\n/g,"<br>")}</p><button aria-label="닫기">✕</button></div>`;
+        el.querySelector("button").onclick=()=>{LS.set("ntcX",String(n.v||""));el.innerHTML=""};
+      }else el.innerHTML="";
+      return n}catch(e){return null}
+  };
+  ctx.loadNotice();
+
   // 댓글
   $("#cm").style.display="";
-  let user=null;
   const when=ts=>{try{const d=ts.toDate();const p=n=>String(n).padStart(2,"0");return p(d.getMonth()+1)+"/"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}catch(e){return ""}};
+  ctx.when=when;
   async function list(){
     try{
       const s=await getDocs(query(collection(db,"comments"),orderBy("t","desc"),limit(30)));
       const items=[];s.forEach(x=>items.push({id:x.id,...x.data()}));
-      $("#cmList").innerHTML=items.length?items.map(c=>`<div class="ci"><div class="m"><b>${esc(c.name)}</b> · ${when(c.t)}${user&&user.uid===c.uid?` · <a href="#" data-del="${esc(c.id)}">삭제</a>`:""}</div><div class="tx">${esc(c.text)}</div></div>`).join(""):`<div class="hint">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</div>`;
+      const u=ctx.user;
+      $("#cmList").innerHTML=items.length?items.map(c=>`<div class="ci"><div class="m"><b>${esc(c.name)}</b> · ${when(c.t)}${u&&(u.uid===c.uid||ctx.admin)?` · <a href="#" data-del="${esc(c.id)}">삭제</a>`:""}</div><div class="tx">${esc(c.text)}</div></div>`).join(""):`<div class="hint">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</div>`;
     }catch(e){$("#cmList").innerHTML=`<div class="hint">댓글을 불러오지 못했어요.</div>`}
   }
+  ctx.login=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(!/closed|cancel/i.test(String(e&&e.code)))alert("로그인하지 못했어요. 팝업 차단을 풀고 다시 시도해 주세요.")}};
+  ctx.logout=()=>signOut(auth);
   function drawAuth(){
+    const user=ctx.user;
     if(user){
       $("#cmAuth").innerHTML=`<div class="who"><span><b>${esc(user.displayName||"회원")}</b> 님으로 로그인됨</span><button id="lo">로그아웃</button></div>`;
       $("#cmForm").innerHTML=`<textarea id="ct" maxlength="300" placeholder="댓글을 입력하세요 (300자까지)"></textarea><div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center"><span class="hint" style="margin:0">구글 이름이 표시돼요</span><button class="pri" id="cs">등록</button></div>`;
-      $("#lo").onclick=()=>signOut(auth);
+      $("#lo").onclick=ctx.logout;
       $("#cs").onclick=async()=>{
         const tx=$("#ct").value.trim(); if(!tx) return;
         $("#cs").disabled=true;
@@ -463,15 +544,33 @@ async function social(){
         ?`<div class="warn">카카오톡·네이버 등 앱 안에서는 구글 로그인이 막혀 있어요.<br>오른쪽 아래(또는 위) <b>⋮ / ⋯ 메뉴 → '다른 브라우저로 열기'</b>를 눌러 크롬이나 사파리에서 열어주세요.</div>`
         :`<div class="who"><span>댓글을 쓰려면 구글로 로그인해 주세요.</span><button class="pri" id="li">구글로 로그인</button></div>`;
       $("#cmForm").innerHTML=`<div class="hint">로그인하면 구글 이름과 이메일이 확인돼요(이메일은 화면에 표시하지 않아요).</div>`;
-      const b=$("#li"); if(b) b.onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(!/closed|cancel/i.test(String(e&&e.code)))alert("로그인하지 못했어요. 팝업 차단을 풀고 다시 시도해 주세요.")}};
+      const b=$("#li"); if(b) b.onclick=ctx.login;
     }
   }
+  ctx.listComments=list;
   $("#cmList").onclick=async e=>{const a=e.target.closest("a[data-del]");if(!a)return;e.preventDefault();
     if(!confirm("이 댓글을 삭제할까요?"))return;
     try{await deleteDoc(doc(db,"comments",a.dataset.del))}catch(x){alert("삭제하지 못했어요.")} list()};
-  onAuthStateChanged(auth,u=>{user=u;drawAuth();list()});
+  // 관리자 확인: config/owner 의 uid 이거나 admins/{uid} 문서가 있으면 관리자
+  async function checkAdmin(){
+    ctx.admin=false;ctx.owner=null;
+    try{const o=await getDoc(doc(db,"config","owner"));ctx.owner=o.exists()?o.data().uid:"";}catch(e){ctx.owner=null}
+    if(ctx.user){
+      if(ctx.owner&&ctx.owner===ctx.user.uid)ctx.admin=true;
+      else{try{ctx.admin=(await getDoc(doc(db,"admins",ctx.user.uid))).exists()}catch(e){}}
+    }
+  }
+  ctx.checkAdmin=checkAdmin;
+  ctx.claimOwner=async()=>{await setDoc(doc(db,"config","owner"),{uid:ctx.user.uid,name:(ctx.user.displayName||"").slice(0,40),t:serverTimestamp()});await checkAdmin()};
+  let first=true;
+  onAuthStateChanged(auth,async u=>{
+    ctx.user=u;await checkAdmin();drawAuth();list();
+    if(first){first=false;FBres(ctx)}
+    window.dispatchEvent(new Event("fbauth"));
+  });
 }
 social();
+
 
 // ───────────────────────── 데이터 ─────────────────────────
 const CAT_ORDER=["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육","수입냉동우육","수입냉장돈육","수입냉동돈육"];
@@ -621,6 +720,8 @@ function route(){
   $$("#sideCats a").forEach(a=>a.classList.toggle("on",R.r==="c"&&a.dataset.c===R.cat));
   CH.clear();
   $("#extras").classList.toggle("hide",R.r!=="home");
+  if(R.r!=="admin"&&window.track)track(R.r,R.r==="c"?R.cat:"");
+  if(R.r==="admin"){viewAdmin($("#view"));return}
   const v=$("#view");
   if(!D.rows.length){v.innerHTML=`<div class="card empty">아직 수집된 데이터가 없어요.</div>`;return}
   if(R.r==="home"){viewHome(v);bindInstall()}
@@ -791,7 +892,7 @@ function listRows(c,ps,g,sort){
   if(!items.length)return `<div class="card empty">이 조건의 데이터가 없어요.</div>`;
   const rr=items.filter(i=>i.r),lo=Math.min(...rr.map(i=>i.r.min_kg)),hi=Math.max(...rr.map(i=>i.r.max_kg)),sp=(hi-lo)||1;
   let last="",o=`<div class="lr hd"><span>부위</span><span>최저가 (원/Kg)</span><span>최고가 (원/Kg)</span><span>가격 범위</span></div>`;
-  items.forEach(({p,r})=>{const gg=grp(c,p);if(sort==="part"&&gg!==last){o+=`<div class="lg">${gg}</div>`;last=gg}
+  items.forEach(({p,r})=>{const gg=grp(c,p);if(sort==="part"&&gg!==last){o+=`<div class="alg">${gg}</div>`;last=gg}
     o+=`<div class="lr"><div class="pn">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(g)}">${esc(nm(p))}</button>${thinMark(r)}</div>`+
       (r?`<div class="lp"><span class="lab">최저</span><b>${won(r.min_kg)}</b><em>${esc(brandTxt(r,"min"))}</em></div>
         <div class="lp x"><span class="lab">최고</span><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>
@@ -985,6 +1086,111 @@ function bindInstall(){
   if(y)y.onclick=async()=>{try{DEFER.prompt();await DEFER.userChoice}catch(e){}DEFER=null;route()};
   if(n)n.onclick=()=>{LS.set("instX","1");route()};
 }
+
+// ───────────────────────── 관리자 (접속 현황) ─────────────────────────
+const AD={per:7,cache:null};
+const md=d=>d.slice(5).replace("-","/");
+function hbars(obj,unit){
+  const a=Object.entries(obj||{}).filter(([,v])=>v>0).sort((x,y)=>y[1]-x[1]);
+  if(!a.length)return `<div class="hint">아직 기록이 없어요.</div>`;
+  const tot=a.reduce((s,[,v])=>s+v,0),mx=a[0][1];
+  return a.slice(0,8).map(([k,v])=>`<div class="bar-row"><span class="bl" title="${esc(k)}">${esc(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div><span class="bval"><b>${v.toLocaleString()}</b> ${Math.round(v/tot*100)}%</span></div>`).join("");
+}
+function vbars(cols,opt={}){
+  const mx=Math.max(1,...cols.map(c=>Math.max(c.a||0,c.b||0)));
+  return `<div class="barv">${cols.map(c=>`<div class="c" title="${esc(c.t||c.x)}">${c.b!=null?`<i class="p" style="height:${(c.b/mx*100).toFixed(1)}%;width:100%;max-width:26px"></i>`:""}<i style="height:${Math.max(c.a?2:0,(c.a||0)/mx*100).toFixed(1)}%;position:relative"></i>${opt.lab&&c.a?`<em style="bottom:calc(${((c.a||0)/mx*100).toFixed(1)}% + 2px)">${c.a}</em>`:""}</div>`).join("")}</div>
+  <div class="barv-x">${cols.map((c,i)=>`<span>${opt.every&&i%opt.every?"":esc(c.x)}</span>`).join("")}</div>`;
+}
+function sumMaps(docs,key){const o={};docs.forEach(d=>{const m=d[key]||{};for(const k in m)o[k]=(o[k]||0)+(+m[k]||0)});return o}
+const PGN={home:"홈",cats:"단가표 목록",c:"종류별 단가",moves:"변동 모니터",fav:"즐겨찾기",all:"전체·인쇄"};
+
+async function viewAdmin(v){
+  v.innerHTML=`<div class="card empty">관리자 화면을 불러오는 중…</div>`;
+  const ctx=await window.FBP;
+  if(R.r!=="admin")return;
+  if(!ctx){v.innerHTML=`<div class="card empty">Firebase에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.</div>`;return}
+  const u=ctx.user;
+  if(!u){
+    v.innerHTML=`<section class="adm"><h2 class="sec-t">🔐 관리자</h2><div class="card">${INAPP?`<div class="warn">앱 안 브라우저에서는 구글 로그인이 막혀요. 크롬·사파리에서 열어주세요.</div>`:`<p style="margin:0 0 12px">관리자 구글 계정으로 로그인해 주세요.</p><button class="btn pri" id="adLi">구글로 로그인</button>`}</div></section>`;
+    const b=$("#adLi");if(b)b.onclick=ctx.login;return;
+  }
+  if(!ctx.admin){
+    const canClaim=ctx.owner==="";
+    v.innerHTML=`<section class="adm"><h2 class="sec-t">🔐 관리자</h2><div class="card">
+      <p style="margin:0 0 8px"><b>${esc(u.displayName||"회원")}</b> 님은 아직 관리자가 아니에요.</p>
+      ${canClaim?`<p class="hint" style="margin:0 0 12px">아직 관리자가 한 명도 없어요. 아래 버튼을 누르면 이 계정이 <b>대표 관리자</b>로 등록돼요. (한 번만 가능)</p><button class="btn pri" id="adClaim">이 계정을 대표 관리자로 등록</button>`
+        :`<p class="hint" style="margin:0">대표 관리자에게 아래 번호를 보내 등록을 요청하세요.<br>Firebase 콘솔 → Firestore → <b>admins</b> 컬렉션에 이 번호로 문서를 만들면 돼요.</p><p style="margin:10px 0 0"><span class="uid">${esc(u.uid)}</span></p>`}
+      <div class="row"><button class="btn" id="adLo">로그아웃</button></div></div></section>`;
+    $("#adLo").onclick=ctx.logout;
+    const c=$("#adClaim");if(c)c.onclick=async()=>{c.disabled=true;try{await ctx.claimOwner();route()}catch(e){alert("등록하지 못했어요. 보안 규칙이 최신인지 확인해 주세요.");c.disabled=false}};
+    return;
+  }
+  const {collection,doc,getDocs,query,where,documentId,getCountFromServer,setDoc,deleteDoc,orderBy,limit,serverTimestamp}=ctx.M.fs;
+  const db=ctx.db;
+  let docs=[],total=null,cms=[],ntc=null;
+  try{
+    const from=KDAY(29);
+    const [s,t,c,n]=await Promise.all([
+      getDocs(query(collection(db,"stats_daily"),where(documentId(),">=",from))),
+      getCountFromServer(collection(db,"visitors")).catch(()=>null),
+      getDocs(query(collection(db,"comments"),orderBy("t","desc"),limit(50))).catch(()=>null),
+      ctx.loadNotice()]);
+    s.forEach(x=>docs.push({day:x.id,...x.data()}));
+    total=t?t.data().count:null;if(c)c.forEach(x=>cms.push({id:x.id,...x.data()}));ntc=n;
+  }catch(e){v.innerHTML=`<div class="card empty">통계를 읽지 못했어요. Firestore 보안 규칙을 새 버전으로 바꿨는지 확인해 주세요.<br><small>${esc(e&&e.code||e)}</small></div>`;return}
+  if(R.r!=="admin")return;
+  const by={};docs.forEach(d=>by[d.day]=d);
+  const days=n=>Array.from({length:n},(_,i)=>KDAY(n-1-i));
+  const g=(d,k)=>(by[d]&&+by[d][k])||0;
+  const today=KDAY(),yest=KDAY(1);
+  const sumN=(n,k,off=0)=>days(n+off).slice(0,n).reduce((s,d)=>s+g(d,k),0);
+  const v7=sumN(7,"v"),v7p=sumN(7,"v",7);
+  const diff=(a,b)=>b?`<span class="${a>=b?"u":"d"}">${a>=b?"▲":"▼"}${Math.abs(Math.round((a-b)/b*100))}%</span> `:"";
+  const pd=days(AD.per).map(d=>by[d]).filter(Boolean);
+  const hrs=sumMaps(pd,"hr");
+  const hourCols=Array.from({length:24},(_,h)=>({x:String(h),a:hrs["h"+String(h).padStart(2,"0")]||0,t:h+"시"}));
+  const d14=days(14).map(d=>({x:md(d),a:g(d,"v"),b:g(d,"pv"),t:`${d} 방문자 ${g(d,"v")} · 접속 ${g(d,"pv")}`}));
+  const pg={};const pm=sumMaps(pd,"pg");for(const k in pm)pg[PGN[k]||k]=pm[k];
+  const perL={1:"오늘",7:"최근 7일",30:"최근 30일"}[AD.per];
+  v.innerHTML=`<section class="adm">
+  <div class="sec-t" style="margin-top:6px">📊 접속 현황 <small style="font-weight:600;color:var(--mute);font-size:12.5px">${esc(u.displayName||"")} · 관리자</small>
+    <button class="btn" id="adLo" style="margin-left:auto;height:34px">로그아웃</button></div>
+  <div class="g-st">
+    <div class="ast"><div class="l">오늘 방문자</div><div class="n">${g(today,"v").toLocaleString()}</div><div class="s">${diff(g(today,"v"),g(yest,"v"))}어제 ${g(yest,"v")}명</div></div>
+    <div class="ast"><div class="l">오늘 접속 횟수</div><div class="n">${g(today,"pv").toLocaleString()}</div><div class="s">창을 새로 열 때마다 1회</div></div>
+    <div class="ast"><div class="l">7일 방문자 합계</div><div class="n">${v7.toLocaleString()}</div><div class="s">${diff(v7,v7p)}지난주 ${v7p}명</div></div>
+    <div class="ast"><div class="l">누적 방문자</div><div class="n">${total!=null?total.toLocaleString():"-"}</div><div class="s">처음 온 사람 기준</div></div>
+    <div class="ast"><div class="l">댓글</div><div class="n">${cms.length}${cms.length>=50?"+":""}</div><div class="s">최근 50개까지 표시</div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="ct">📅 최근 14일 접속 추이<small>막대: 방문자 · 연한 막대: 접속 횟수</small></div>${vbars(d14,{lab:1,every:wideNow()?0:2})}
+    <div class="alg"><span><i style="background:var(--acc)"></i>방문자</span><span><i style="background:color-mix(in srgb,var(--acc) 18%,transparent)"></i>접속 횟수</span></div></div>
+  <div class="row" style="margin:16px 2px 4px"><div class="seg" id="adPer">${[1,7,30].map(n=>`<button class="${AD.per===n?"on":""}" data-n="${n}">${{1:"오늘",7:"7일",30:"30일"}[n]}</button>`).join("")}</div><span class="hint" style="margin:0">아래 그래프 기간: ${perL}</span></div>
+  <div class="card" style="margin-top:10px"><div class="ct">🕐 시간대별 접속<small>${perL} · 한국 시간</small></div>${vbars(hourCols,{every:3})}</div>
+  <div class="g2" style="margin-top:14px">
+    <div class="card"><div class="ct">📱 기기별 접속 (OS)</div>${hbars(sumMaps(pd,"os"))}</div>
+    <div class="card"><div class="ct">🌐 브라우저별 접속</div>${hbars(sumMaps(pd,"br"))}</div>
+    <div class="card"><div class="ct">💻 화면 종류</div>${hbars(sumMaps(pd,"dev"))}</div>
+    <div class="card"><div class="ct">🔗 들어온 경로</div>${hbars(sumMaps(pd,"src"))}</div>
+    <div class="card"><div class="ct">👀 많이 본 화면</div>${hbars(pg)}</div>
+    <div class="card"><div class="ct">🥩 많이 본 종류</div>${hbars(sumMaps(pd,"cv"))}</div>
+  </div>
+  <div class="sec-t">📢 공지 띄우기</div>
+  <div class="card"><textarea id="adNt" maxlength="300" placeholder="홈 화면 맨 위에 보일 공지를 입력하세요 (예: 설 연휴 기간에는 단가가 갱신되지 않아요)">${esc(ntc&&ntc.text||"")}</textarea>
+    <div class="row"><button class="btn pri" id="adNs">공지 저장</button><button class="btn" id="adNc">공지 내리기</button><span class="hint" style="margin:0" id="adNm">${ntc&&ntc.text&&ntc.on!==false?"지금 공지가 보이고 있어요":"지금 보이는 공지 없음"}</span></div></div>
+  <div class="sec-t">💬 댓글 관리 <small style="font-weight:600;color:var(--mute);font-size:12.5px">${cms.length}개</small></div>
+  <div class="card" id="adCm">${cms.length?cms.map(c=>`<div class="cmi"><div class="tx"><div class="m"><b>${esc(c.name)}</b> · ${ctx.when(c.t)}</div>${esc(c.text)}</div><button class="btn" data-del="${esc(c.id)}" style="height:32px">삭제</button></div>`).join(""):`<div class="hint">댓글이 없어요.</div>`}</div>
+  <p class="hint" style="margin:14px 2px">방문 통계에는 이름·연락처·IP를 저장하지 않고 기기 종류와 시간대만 날짜별 합계로 남겨요. 통계는 이번 업데이트 이후 방문부터 쌓여요.</p>
+  </section>`;
+  $("#adLo").onclick=()=>{ctx.logout();setTimeout(route,300)};
+  $("#adPer").onclick=e=>{const b=e.target.closest("button");if(!b)return;AD.per=+b.dataset.n;viewAdmin(v)};
+  const saveN=async on=>{const t=$("#adNt").value.trim();if(on&&!t)return alert("공지 내용을 입력해 주세요.");
+    try{await setDoc(doc(db,"notice","main"),{text:on?t.slice(0,300):"",on,v:Date.now(),by:u.uid,t:serverTimestamp()});$("#adNm").textContent=on?"저장했어요. 홈 화면 맨 위에 보여요.":"공지를 내렸어요.";if(!on)$("#adNt").value="";ctx.loadNotice()}
+    catch(e){alert("저장하지 못했어요. 보안 규칙을 확인해 주세요.")}};
+  $("#adNs").onclick=()=>saveN(true);$("#adNc").onclick=()=>saveN(false);
+  $("#adCm").onclick=async e=>{const b=e.target.closest("[data-del]");if(!b)return;if(!confirm("이 댓글을 삭제할까요?"))return;
+    try{await deleteDoc(doc(db,"comments",b.dataset.del));b.closest(".cmi").remove();ctx.listComments()}catch(x){alert("삭제하지 못했어요.")}};
+}
+window.addEventListener("fbauth",()=>{if(R.r==="admin")route()});
 
 // ───────────────────────── 시작 ─────────────────────────
 async function load(){
