@@ -26,6 +26,36 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
+/* ── 홈 상단 숫자 · 바로가기 · 가입 요청 ── */
+@media(max-width:1023px){.pc-only{display:none!important}}
+.hs{display:grid;grid-template-columns:1fr 1fr 1.25fr 1.25fr;gap:8px;align-items:center;margin:0 0 12px}
+.hs-n{text-align:center;line-height:1.25}.hs-n span{display:block;font-size:12px;color:var(--sub)}.hs-n b{font-size:17px;font-weight:800}
+.hs-b{height:40px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.hs-b b{color:var(--sub);font-weight:700;margin-left:2px}.hs-b.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+.hs-r{grid-column:1/-1;text-align:center;background:#fff7e0;border:1px solid #f0dca0;color:#5a4610;border-radius:12px;padding:8px;font-weight:700;font-size:13.5px}
+@media(min-width:760px){.hs{display:flex;gap:12px}.hs .hs-b{width:150px}.hs-n:nth-child(2){margin-right:auto}.hs-n{text-align:left;display:flex;gap:6px;align-items:baseline;padding:0 6px}.hs-n span{display:inline}.hs-r{grid-column:auto}}
+.ctas{margin-top:14px;display:grid;gap:12px}
+@media(min-width:1024px){.ctas{grid-template-columns:1fr 1.4fr;align-items:stretch}}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px;border-radius:16px;font-size:16.5px;font-weight:800;text-align:center;padding:10px 14px}
+.cta.buy{background:#17402f;color:#fff;box-shadow:var(--sh)}
+.cta.out{border:1.5px solid #17402f;background:#f4f7f4;color:#17402f;margin-top:14px}
+.cta.call{background:#fee500;color:#191919}.cta.sms{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+@media (prefers-color-scheme:dark){.cta.buy{background:#2c6b50}.cta.out{background:transparent;border-color:#5fae8a;color:#8fd3b3}}
+.join1{text-align:center}.join1 h3{margin:0 0 4px;font-size:18px}
+.sub{color:var(--sub);font-size:13.5px;margin:0 0 12px}
+.refbox{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:17px}
+.lnk{border:0;background:none;color:var(--sub);text-decoration:underline;font-size:13px;padding:4px}
+.g-2c{display:grid;gap:10px;grid-template-columns:1fr}@media(min-width:600px){.g-2c{grid-template-columns:1fr 1fr}}
+.jf .fl{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}.jf .fl em{font-style:normal;color:var(--up);font-size:12px;margin-left:4px}.jf .fl span{color:var(--mute);font-size:12px;font-weight:600;margin-left:4px}
+.jf .inp{width:100%}.jf textarea.inp{height:auto;padding:10px 12px;resize:vertical;font:inherit}
+.up{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:14px;padding:16px;cursor:pointer;background:var(--chip);font-size:14.5px}
+.up-i{font-size:24px}.up small{color:var(--mute)}
+.pv{display:block;max-width:100%;max-height:260px;margin:10px auto 0;border-radius:10px;border:1px solid var(--line)}
+.agree{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--sub);margin:16px 0 8px}.agree input{width:18px;height:18px;margin-top:1px;accent-color:var(--acc);flex:none}
+.done{text-align:center;padding:16px 0;font-size:34px}.done h3{font-size:19px;margin:8px 0}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d2127;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+@media print{.hs,.ctas{display:none!important}}
+
 /* ── 공지 · 관리자 ── */
 .ntc{display:flex;gap:10px;align-items:flex-start;background:#fff7e0;border:1px solid #f0dca0;color:#5a4610;border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:14.5px}
 .ntc p{margin:0;flex:1;line-height:1.55}.ntc button{border:0;background:transparent;font-size:16px;color:inherit;opacity:.6;padding:0 2px}
@@ -55,6 +85,9 @@ footer.ft .adm-l{display:inline-block;margin-top:6px;font-size:11px;color:var(--
 .adm .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
 .adm .cmi{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px}.adm .cmi:first-child{border-top:0}
 .adm .cmi .tx{flex:1;min-width:0;word-break:break-all}.adm .cmi .m{font-size:12px;color:var(--mute)}
+.adm .jr{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.adm .jr:first-child{border-top:0}
+.adm .jr img,.adm .jr .pdf{width:92px;height:92px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:pointer;flex:none;background:var(--chip)}
+.adm .jr-b{flex:1;min-width:0}.adm .jr .m{font-size:12px;color:var(--mute)}.adm .jr .ph{font-size:18px;font-weight:800;display:inline-block;margin:2px 0}
 .adm .uid{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--chip);padding:2px 6px;border-radius:6px;word-break:break-all}
 @media print{.ntc,footer.ft .adm-l{display:none!important}}
 
@@ -390,6 +423,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
     <a href="#/moves" data-nav="moves"><svg class="i"><use href="#i-trend"/></svg>변동 모니터</a>
     <a href="#/fav" data-nav="fav"><svg class="i"><use href="#i-star"/></svg>즐겨찾기</a>
     <a href="#/all" data-nav="all"><svg class="i"><use href="#i-print"/></svg>전체 단가표 · 인쇄</a>
+    <a href="#/join" data-nav="join"><svg class="i"><use href="#i-chat"/></svg>상담 · 가입 요청</a>
     <div class="side-h">종류별 단가</div>
     <div id="sideCats"></div>
     <div class="side-foot" id="sideFoot"></div>
@@ -407,11 +441,10 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
     <section id="extras" class="hide">
       <div class="sec-t">💬 댓글</div>
       <section class="cm" id="cm" style="display:none"><div class="box"><div id="cmAuth"></div><div id="cmForm"></div></div><div class="box" id="cmList" style="margin-top:10px"></div></section>
-      <div class="vis" id="vis" style="display:none">👀 오늘 방문 <b id="vd">-</b>명 · 전체 방문 <b id="vt">-</b>명</div>
     </section>
 
     <footer class="ft">
-      만든이: 이현용 매니저 / 문의: 010-3371-8953
+      개발자: 이현용 매니저 / 문의: 010-3371-8953
       <span class="cp">금천미트 가입 시 가입경로상세 - 이현용 기입 시 쿠폰 증정</span>
       <a class="adm-l" href="#/admin">관리</a>
     </footer>
@@ -422,7 +455,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
     <a href="#/cats" data-nav="cats"><svg class="i"><use href="#i-list"/></svg>단가표</a>
     <a href="#/moves" data-nav="moves"><svg class="i"><use href="#i-trend"/></svg>변동</a>
     <a href="#/fav" data-nav="fav"><svg class="i"><use href="#i-star"/></svg>즐겨찾기</a>
-    <a href="#/all" data-nav="all"><svg class="i"><use href="#i-print"/></svg>인쇄</a>
+    <a href="#/join" data-nav="join"><svg class="i"><use href="#i-chat"/></svg>상담·가입</a>
   </nav>
 </div>
 
@@ -435,6 +468,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
   <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
 </svg>
 
@@ -464,6 +498,9 @@ const ENV=(()=>{
 const TQ=[];let TF=null;
 window.track=(r,c)=>{const k="pg:"+r+(c?":"+c:"");if(SS.get(k))return;SS.set(k,"1");TF?TF(r,c):TQ.push([r,c])};
 let FBres;window.FBP=new Promise(r=>FBres=r);
+// 홈 상단 숫자(방문·좋아요·관리자 요청 수)
+window.HS={vd:null,vt:null,lk:null,liked:LS.get("liked")==="1",req:null};
+const hsDraw=()=>{try{window.drawHS&&drawHS()}catch(e){}};
 
 async function social(){
   let M;
@@ -497,8 +534,17 @@ async function social(){
   TQ.splice(0).forEach(a=>TF(...a));
   try{
     const [t,d]=await Promise.all([getCountFromServer(collection(db,"visitors")),getCountFromServer(query(collection(db,"daily"),where("day","==",day)))]);
-    $("#vt").textContent=t.data().count.toLocaleString(); $("#vd").textContent=d.data().count.toLocaleString(); $("#vis").style.display="";
+    HS.vt=t.data().count; HS.vd=d.data().count; hsDraw();
   }catch(e){}
+  // 좋아요: 기기마다 한 번 (다시 누르면 취소)
+  try{const l=await getDoc(doc(db,"likes","main"));HS.lk=l.exists()?(+l.data().n||0):0;hsDraw()}catch(e){}
+  ctx.like=async()=>{
+    const on=!HS.liked;HS.liked=on;HS.lk=Math.max(0,(HS.lk||0)+(on?1:-1));LS.set("liked",on?"1":"0");hsDraw();
+    try{await setDoc(doc(db,"likes","main"),{n:increment(on?1:-1)},{merge:true})}
+    catch(e){HS.liked=!on;HS.lk=Math.max(0,HS.lk+(on?-1:1));LS.set("liked",on?"0":"1");hsDraw()}
+  };
+  // 금천미트 아이디 생성 요청 (사업자등록증 + 휴대폰 번호) → 관리자만 볼 수 있음
+  ctx.submitJoin=async r=>{await addDoc(collection(db,"join_requests"),{name:r.name.slice(0,60),phone:r.phone.slice(0,20),memo:r.memo.slice(0,300),file:r.file,ftype:r.ftype,fname:r.fname.slice(0,100),agree:true,t:serverTimestamp()})};
 
   // 공지
   ctx.loadNotice=async()=>{
@@ -565,6 +611,7 @@ async function social(){
   let first=true;
   onAuthStateChanged(auth,async u=>{
     ctx.user=u;await checkAdmin();drawAuth();list();
+    HS.req=null;if(ctx.admin){try{HS.req=(await getCountFromServer(collection(db,"join_requests"))).data().count}catch(e){}}hsDraw();
     if(first){first=false;FBres(ctx)}
     window.dispatchEvent(new Event("fbauth"));
   });
@@ -724,12 +771,13 @@ function route(){
   if(R.r==="admin"){viewAdmin($("#view"));return}
   const v=$("#view");
   if(!D.rows.length){v.innerHTML=`<div class="card empty">아직 수집된 데이터가 없어요.</div>`;return}
-  if(R.r==="home"){viewHome(v);bindInstall()}
+  if(R.r==="home"){viewHome(v);bindInstall();bindHS();bindCTA()}
   else if(R.r==="cats")viewCats(v);
   else if(R.r==="c")viewCat(v,R.cat,R.tab);
   else if(R.r==="moves")viewMoves(v);
   else if(R.r==="fav")viewPrint(v,true);
   else if(R.r==="all")viewPrint(v,false);
+  else if(R.r==="join")viewJoin(v);
   else viewHome(v);
   drawCharts();
 }
@@ -766,18 +814,20 @@ function viewHome(v){
   const ser=I.filter(x=>x.idx.length>1).map(x=>({n:x.c,c:meta(x.c).c,v:allDays.map(d=>{const i=x.idxDays.indexOf(d);return i<0?null:x.idx[i]})}));
   const f=favs().map(k=>{const i=k.indexOf("|");return[k.slice(0,i),k.slice(i+1)]}).filter(([c])=>D.info[c]);
   v.innerHTML=`
+  ${hsHTML()}
   <section class="hero">
     <div><div class="eb">기준일 ${lastDay} · 명품 제외 · Kg당 원</div><h2>오늘의 시세 브리핑</h2><p>${brief}</p></div>
     <div class="dn">${donut([{v:ups,c:"#ffd2c9"},{v:dns,c:"#9cc2ff"},{v:eq,c:"rgba(255,255,255,.55)"}])}<div><b>${comp?Math.round((ups+dns)/comp*100):0}%</b>변동 품목</div></div>
   </section>
   ${installCard()}
-  <div class="grid g-kpi" style="margin-top:14px">
+  <div class="ctas">${ctaHTML()}</div>
+  <div class="grid g-kpi pc-only" style="margin-top:14px">
     <div class="card kpi"><div class="k-t"><span class="k-ic ac"><svg class="i"><use href="#i-box"/></svg></span>수집 품목</div><div class="k-v">${items.toLocaleString()}<small>개</small></div><div class="k-s">${D.cats.length}개 종류</div></div>
     <div class="card kpi"><div class="k-t"><span class="k-ic up"><svg class="i"><use href="#i-up"/></svg></span>오른 품목</div><div class="k-v" style="color:var(--up)">${ups}<small>개</small></div><div class="k-s">전일 대비 최저가 기준</div></div>
     <div class="card kpi"><div class="k-t"><span class="k-ic dn"><svg class="i"><use href="#i-down"/></svg></span>내린 품목</div><div class="k-v" style="color:var(--dn)">${dns}<small>개</small></div><div class="k-s">${lows?`그중 기록 최저 ${lows}개`:"전일 대비 최저가 기준"}</div></div>
     <div class="card kpi"><div class="k-t"><span class="k-ic"><svg class="i"><use href="#i-bolt"/></svg></span>최대 변동</div><div class="k-v" style="color:${big?(big.p>0?"var(--up)":"var(--dn)"):"inherit"}">${big?(big.p>0?"+":"")+big.p.toFixed(1)+"<small>%</small>":"-"}</div><div class="k-s">${big?esc(big.c+" "+nm(big.r.part)+(big.r.grade_f!=="전체"?" "+big.r.grade_f:"")):"변동 없음"}</div></div>
   </div>
-  <div class="grid g-2" style="margin-top:14px">
+  <div class="grid g-2 pc-only" style="margin-top:14px">
     <div class="card"><div class="card-h">🔔 변동 큰 품목 <small>전일 대비</small><a class="more" href="#/moves">전체 보기 ›</a></div>
       ${top.length?top.map(mvRow).join(""):`<div class="empty">${comp?"어제와 달라진 가격이 없어요.":"비교할 전날 데이터가 아직 없어요.<br>내일부터 표시돼요."}</div>`}</div>
     <div class="card"><div class="card-h">📈 종류별 가격 흐름 <small>첫날 = 100</small></div>
@@ -1016,7 +1066,7 @@ function openSheet(c,p,g0){
 
 // ───────────────────────── 연락처 QR ─────────────────────────
 const QR_SVG=`<svg class="qr" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="전화 연결 QR 코드"><rect width="100%" height="100%" fill="#fff"/><path d="M2 2h7v1h-7zM10 2h1v1h-1zM12 2h3v1h-3zM20 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM13 3h2v1h-2zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM15 4h1v1h-1zM17 4h2v1h-2zM20 4h1v1h-1zM22 4h3v1h-3zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM13 5h2v1h-2zM16 5h3v1h-3zM20 5h1v1h-1zM22 5h3v1h-3zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM15 6h2v1h-2zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h3v1h-3zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h8v1h-8zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h7v1h-7zM10 9h2v1h-2zM13 9h2v1h-2zM16 9h1v1h-1zM2 10h1v1h-1zM6 10h1v1h-1zM8 10h3v1h-3zM12 10h1v1h-1zM14 10h4v1h-4zM19 10h5v1h-5zM26 10h1v1h-1zM3 11h1v1h-1zM7 11h1v1h-1zM9 11h2v1h-2zM12 11h3v1h-3zM19 11h1v1h-1zM21 11h4v1h-4zM4 12h3v1h-3zM8 12h1v1h-1zM15 12h3v1h-3zM21 12h4v1h-4zM2 13h1v1h-1zM9 13h3v1h-3zM13 13h1v1h-1zM15 13h1v1h-1zM18 13h1v1h-1zM20 13h1v1h-1zM23 13h2v1h-2zM3 14h2v1h-2zM6 14h1v1h-1zM8 14h3v1h-3zM12 14h4v1h-4zM18 14h1v1h-1zM20 14h1v1h-1zM23 14h4v1h-4zM2 15h2v1h-2zM5 15h3v1h-3zM9 15h2v1h-2zM12 15h1v1h-1zM15 15h3v1h-3zM19 15h1v1h-1zM21 15h2v1h-2zM24 15h1v1h-1zM5 16h1v1h-1zM7 16h2v1h-2zM10 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM21 16h3v1h-3zM4 17h1v1h-1zM6 17h1v1h-1zM11 17h2v1h-2zM14 17h1v1h-1zM16 17h2v1h-2zM23 17h3v1h-3zM2 18h4v1h-4zM7 18h2v1h-2zM10 18h4v1h-4zM15 18h2v1h-2zM18 18h9v1h-9zM10 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM17 19h2v1h-2zM22 19h1v1h-1zM25 19h1v1h-1zM2 20h7v1h-7zM10 20h2v1h-2zM13 20h4v1h-4zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h3v1h-3zM2 21h1v1h-1zM8 21h1v1h-1zM11 21h3v1h-3zM15 21h1v1h-1zM17 21h2v1h-2zM22 21h3v1h-3zM26 21h1v1h-1zM2 22h1v1h-1zM4 22h3v1h-3zM8 22h1v1h-1zM10 22h2v1h-2zM14 22h2v1h-2zM18 22h8v1h-8zM2 23h1v1h-1zM4 23h3v1h-3zM8 23h1v1h-1zM11 23h2v1h-2zM15 23h3v1h-3zM20 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h3v1h-3zM8 24h1v1h-1zM12 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM24 24h2v1h-2zM2 25h1v1h-1zM8 25h1v1h-1zM11 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM19 25h2v1h-2zM23 25h3v1h-3zM2 26h7v1h-7zM10 26h1v1h-1zM13 26h1v1h-1zM15 26h2v1h-2zM20 26h7v1h-7z" fill="#000"/></svg>`;
-const contactBlock=()=>`<div class="contact">${QR_SVG}<div class="t">휴대폰 카메라로 QR을 찍으면 바로 전화가 연결돼요<b>📞 010-3371-8953</b>만든이: 이현용 매니저<span class="cp">금천미트 가입 시 가입경로상세 - 이현용 기입 시 쿠폰 증정</span></div></div>`;
+const contactBlock=()=>`<div class="contact">${QR_SVG}<div class="t">휴대폰 카메라로 QR을 찍으면 바로 전화가 연결돼요<b>📞 010-3371-8953</b>개발자: 이현용 매니저<span class="cp">금천미트 가입 시 가입경로상세 - 이현용 기입 시 쿠폰 증정</span></div></div>`;
 
 // ───────────────────────── 전체 / 즐겨찾기 (인쇄) ─────────────────────────
 function viewPrint(v,onlyFav){
@@ -1087,6 +1137,112 @@ function bindInstall(){
   if(n)n.onclick=()=>{LS.set("instX","1");route()};
 }
 
+// ───────────────────────── 홈 상단 · 상담/가입 요청 ─────────────────────────
+const SHOP="https://www.ekcm.co.kr/",TEL="01033718953",TELD="010-3371-8953",REF="이현용";
+const nf=n=>n==null?"-":Number(n).toLocaleString();
+function hsHTML(){
+  return `<div class="hs" id="hs">
+    <div class="hs-n"><span>오늘 방문</span><b id="hsD">${nf(HS.vd)}</b></div>
+    <div class="hs-n"><span>전체 방문</span><b id="hsT">${nf(HS.vt)}</b></div>
+    <button class="hs-b${HS.liked?" on":""}" id="hsL" aria-pressed="${HS.liked}">👍 좋아요 <b id="hsLn">${HS.lk==null?"":nf(HS.lk)}</b></button>
+    <button class="hs-b" id="hsS">↗ 공유</button>
+    ${HS.req?`<a class="hs-r" href="#/admin">📝 새 아이디 요청 ${HS.req}건</a>`:""}
+  </div>`;
+}
+window.drawHS=()=>{const h=$("#hs");if(!h)return;h.outerHTML=hsHTML();bindHS()};
+function bindHS(){
+  const l=$("#hsL");if(l)l.onclick=async()=>{const c=await window.FBP;if(c&&c.like)c.like();else alert("잠시 후 다시 눌러주세요.")};
+  const s=$("#hsS");if(s)s.onclick=async()=>{
+    const url=location.href.split("#")[0];
+    try{if(navigator.share){await navigator.share({title:document.title,text:"금천미트 도매 단가표",url});return}}catch(e){if(e&&e.name==="AbortError")return}
+    try{await navigator.clipboard.writeText(url);toast("주소를 복사했어요. 카톡에 붙여넣어 보내세요!")}catch(e){prompt("이 주소를 복사해 보내세요",url)}
+  };
+}
+function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2400)}
+async function copyRef(){try{await navigator.clipboard.writeText(REF);toast("'"+REF+"' 복사했어요")}catch(e){prompt("복사해서 붙여넣으세요",REF)}}
+function ctaHTML(){
+  return `<a class="cta buy" href="${SHOP}" target="_blank" rel="noopener">🛒 금천미트 구매하러 바로가기</a>
+  <div class="card join1">
+    <h3>금천미트 처음 이용하시나요?</h3>
+    <p class="sub">회원가입 때 '가입경로 상세'에 <b>${REF}</b>을 적으면 쿠폰을 드려요</p>
+    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
+    <a class="cta out" href="#/join">📝 금천미트 아이디 생성 요청</a>
+    <p class="sub" style="margin:8px 0 0">사업자등록증과 휴대폰 번호를 보내주시면 아이디를 만들어 연락드려요</p>
+  </div>`;
+}
+function bindCTA(){$$("[data-copy]").forEach(b=>b.onclick=copyRef)}
+
+function viewJoin(v){
+  v.innerHTML=`<section class="joinp">
+  <div class="sec-t" style="margin-top:4px">💬 상담 및 가입 요청</div>
+  <div class="grid g-2c">
+    <a class="cta call" href="tel:${TEL}">📞 전화 상담 ${TELD}</a>
+    <a class="cta sms" href="sms:${TEL}">✉️ 문자로 문의하기</a>
+  </div>
+  <a class="cta buy" href="${SHOP}" target="_blank" rel="noopener" style="margin-top:10px">🛒 금천미트 구매하러 바로가기</a>
+  <div class="card join1" style="margin-top:14px">
+    <h3>가입할 때 쿠폰 받기</h3>
+    <p class="sub">금천미트 회원가입 화면의 '가입경로 상세'에 아래처럼 적어주세요</p>
+    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
+  </div>
+  <div class="sec-t">📝 금천미트 아이디 생성 요청</div>
+  <form class="card jf" id="jf" autocomplete="on">
+    <p class="sub" style="margin:0 0 14px">직접 가입하기 어려우시면 아래를 보내주세요. 확인 후 아이디를 만들어 휴대폰으로 연락드려요.</p>
+    <label class="fl">휴대폰 번호 <em>필수</em></label>
+    <input class="inp" id="jPh" type="tel" inputmode="tel" placeholder="010-0000-0000" maxlength="13" autocomplete="tel" required>
+    <label class="fl">사업자등록증 <em>필수</em></label>
+    <label class="up" id="jUp"><input id="jFile" type="file" accept="image/*,application/pdf" hidden>
+      <span class="up-i">📎</span><span id="jFn">사진을 찍거나 파일을 골라주세요<br><small>사진(JPG·PNG) 또는 PDF</small></span></label>
+    <div id="jPv"></div>
+    <label class="fl">상호명 <span>선택</span></label>
+    <input class="inp" id="jNm" maxlength="60" placeholder="예: OO정육점" autocomplete="organization">
+    <label class="fl">요청 사항 <span>선택</span></label>
+    <textarea class="inp" id="jMm" maxlength="300" rows="3" placeholder="연락 받기 편한 시간 등"></textarea>
+    <label class="agree"><input type="checkbox" id="jAg"> <span>아이디 생성과 연락을 위해 휴대폰 번호와 사업자등록증을 받는 데 동의해요. 확인 후 요청 내용은 삭제돼요.</span></label>
+    <button class="btn pri" id="jGo" type="submit" style="width:100%;height:52px;font-size:16px;margin-top:6px">요청 보내기</button>
+    <div id="jMsg" class="hint" style="text-align:center;margin-top:10px"></div>
+  </form></section>`;
+  bindCTA();
+  const ph=$("#jPh");ph.oninput=()=>{const d=ph.value.replace(/\D/g,"").slice(0,11);ph.value=d.length<4?d:d.length<8?d.slice(0,3)+"-"+d.slice(3):d.slice(0,3)+"-"+d.slice(3,d.length-4)+"-"+d.slice(-4)};
+  let F=null;
+  $("#jFile").onchange=async e=>{
+    const f=e.target.files[0];F=null;$("#jPv").innerHTML="";if(!f)return;
+    $("#jFn").innerHTML="파일 준비 중…";
+    try{F=await packFile(f);$("#jFn").innerHTML=`<b>${esc(f.name)}</b><br><small>다른 파일로 바꾸려면 다시 누르세요</small>`;
+      $("#jPv").innerHTML=F.ftype.startsWith("image/")?`<img class="pv" src="${F.file}" alt="첨부 미리보기">`:`<div class="hint">📄 PDF 첨부됨</div>`;
+    }catch(x){$("#jFn").innerHTML="사진을 찍거나 파일을 골라주세요<br><small>사진(JPG·PNG) 또는 PDF</small>";alert(x.message||"파일을 읽지 못했어요.")}
+  };
+  $("#jf").onsubmit=async e=>{
+    e.preventDefault();
+    const phone=ph.value.trim();
+    if(!/^01[016789]-?\d{3,4}-?\d{4}$/.test(phone))return alert("휴대폰 번호를 확인해 주세요.");
+    if(!F)return alert("사업자등록증을 첨부해 주세요.");
+    if(!$("#jAg").checked)return alert("개인정보 동의에 체크해 주세요.");
+    const b=$("#jGo");b.disabled=true;b.textContent="보내는 중…";
+    const ctx=await window.FBP;
+    if(!ctx||!ctx.submitJoin){b.disabled=false;b.textContent="요청 보내기";return alert("지금은 보낼 수 없어요. 전화(${TELD})로 문의해 주세요.")}
+    try{await ctx.submitJoin({phone,name:$("#jNm").value.trim(),memo:$("#jMm").value.trim(),...F});
+      $("#jf").innerHTML=`<div class="done">✅<h3>요청을 보냈어요</h3><p class="sub">확인 후 <b>${esc(phone)}</b>로 연락드릴게요.<br>급하시면 ${TELD}로 전화 주세요.</p><a class="btn" href="#/">홈으로</a></div>`;
+    }catch(x){b.disabled=false;b.textContent="요청 보내기";alert("보내지 못했어요. 잠시 후 다시 시도하거나 전화(${TELD})로 문의해 주세요.")}
+  };
+}
+// 사진은 줄여서(최대 1600px) JPG로, PDF는 650KB까지
+async function packFile(f){
+  const rd=b=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(new Error("파일을 읽지 못했어요."));r.readAsDataURL(b)});
+  if(f.type==="application/pdf"){if(f.size>650*1024)throw new Error("PDF가 너무 커요(650KB까지). 사업자등록증을 사진으로 찍어 올려주세요.");return {file:await rd(f),ftype:"application/pdf",fname:f.name}}
+  if(!f.type.startsWith("image/"))throw new Error("사진이나 PDF만 올릴 수 있어요.");
+  const url=URL.createObjectURL(f);
+  const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error("사진을 열지 못했어요. 다른 사진으로 해주세요."));i.src=url});
+  let w=img.naturalWidth,h=img.naturalHeight,s=Math.min(1,1600/Math.max(w,h));
+  for(let q=.8;;q-=.12){
+    const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
+    const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
+    const d=c.toDataURL("image/jpeg",q);
+    if(d.length<880000){URL.revokeObjectURL(url);return {file:d,ftype:"image/jpeg",fname:f.name}}
+    if(q<.4){s*=.75;q=.8}
+  }
+}
+
 // ───────────────────────── 관리자 (접속 현황) ─────────────────────────
 const AD={per:7,cache:null};
 const md=d=>d.slice(5).replace("-","/");
@@ -1127,14 +1283,15 @@ async function viewAdmin(v){
   }
   const {collection,doc,getDocs,query,where,documentId,getCountFromServer,setDoc,deleteDoc,orderBy,limit,serverTimestamp}=ctx.M.fs;
   const db=ctx.db;
-  let docs=[],total=null,cms=[],ntc=null;
+  let docs=[],total=null,cms=[],ntc=null,jrs=[];
   try{
     const from=KDAY(29);
     const [s,t,c,n]=await Promise.all([
       getDocs(query(collection(db,"stats_daily"),where(documentId(),">=",from))),
       getCountFromServer(collection(db,"visitors")).catch(()=>null),
       getDocs(query(collection(db,"comments"),orderBy("t","desc"),limit(50))).catch(()=>null),
-      ctx.loadNotice()]);
+      ctx.loadNotice(),
+      getDocs(query(collection(db,"join_requests"),orderBy("t","desc"),limit(30))).then(q=>{q.forEach(x=>jrs.push({id:x.id,...x.data()}))}).catch(()=>{})]);
     s.forEach(x=>docs.push({day:x.id,...x.data()}));
     total=t?t.data().count:null;if(c)c.forEach(x=>cms.push({id:x.id,...x.data()}));ntc=n;
   }catch(e){v.innerHTML=`<div class="card empty">통계를 읽지 못했어요. Firestore 보안 규칙을 새 버전으로 바꿨는지 확인해 주세요.<br><small>${esc(e&&e.code||e)}</small></div>`;return}
@@ -1160,8 +1317,16 @@ async function viewAdmin(v){
     <div class="ast"><div class="l">오늘 접속 횟수</div><div class="n">${g(today,"pv").toLocaleString()}</div><div class="s">창을 새로 열 때마다 1회</div></div>
     <div class="ast"><div class="l">7일 방문자 합계</div><div class="n">${v7.toLocaleString()}</div><div class="s">${diff(v7,v7p)}지난주 ${v7p}명</div></div>
     <div class="ast"><div class="l">누적 방문자</div><div class="n">${total!=null?total.toLocaleString():"-"}</div><div class="s">처음 온 사람 기준</div></div>
-    <div class="ast"><div class="l">댓글</div><div class="n">${cms.length}${cms.length>=50?"+":""}</div><div class="s">최근 50개까지 표시</div></div>
+    <div class="ast"><div class="l">아이디 생성 요청</div><div class="n" style="color:${jrs.length?"var(--up)":"inherit"}">${jrs.length}</div><div class="s">${jrs.length?"아래에서 확인하세요":"새 요청 없음"}</div></div>
   </div>
+  <div class="sec-t">📝 아이디 생성 요청 <small style="font-weight:600;color:var(--mute);font-size:12.5px">${jrs.length}건</small></div>
+  <div class="card" id="adJr">${jrs.length?jrs.map(r=>`<div class="jr">
+      ${r.ftype&&r.ftype.startsWith("image/")?`<img src="${r.file}" alt="사업자등록증" data-open="${esc(r.id)}">`:`<button class="pdf" data-open="${esc(r.id)}">📄<br>PDF</button>`}
+      <div class="jr-b"><div class="m">${ctx.when(r.t)}</div>
+        <a class="ph" href="tel:${esc((r.phone||"").replace(/\D/g,""))}">📞 ${esc(r.phone)}</a>
+        ${r.name?`<div><b>${esc(r.name)}</b></div>`:""}${r.memo?`<div class="hint" style="margin:2px 0 0">${esc(r.memo)}</div>`:""}
+        <div class="row" style="margin-top:6px"><button class="btn" data-open="${esc(r.id)}" style="height:34px">크게 보기</button><a class="btn" href="sms:${esc((r.phone||"").replace(/\D/g,""))}" style="height:34px">문자</a><button class="btn" data-jdel="${esc(r.id)}" style="height:34px">처리 완료(삭제)</button></div>
+      </div></div>`).join(""):`<div class="hint">새 요청이 없어요.</div>`}</div>
   <div class="card" style="margin-top:14px"><div class="ct">📅 최근 14일 접속 추이<small>막대: 방문자 · 연한 막대: 접속 횟수</small></div>${vbars(d14,{lab:1,every:wideNow()?0:2})}
     <div class="alg"><span><i style="background:var(--acc)"></i>방문자</span><span><i style="background:color-mix(in srgb,var(--acc) 18%,transparent)"></i>접속 횟수</span></div></div>
   <div class="row" style="margin:16px 2px 4px"><div class="seg" id="adPer">${[1,7,30].map(n=>`<button class="${AD.per===n?"on":""}" data-n="${n}">${{1:"오늘",7:"7일",30:"30일"}[n]}</button>`).join("")}</div><span class="hint" style="margin:0">아래 그래프 기간: ${perL}</span></div>
@@ -1187,6 +1352,13 @@ async function viewAdmin(v){
     try{await setDoc(doc(db,"notice","main"),{text:on?t.slice(0,300):"",on,v:Date.now(),by:u.uid,t:serverTimestamp()});$("#adNm").textContent=on?"저장했어요. 홈 화면 맨 위에 보여요.":"공지를 내렸어요.";if(!on)$("#adNt").value="";ctx.loadNotice()}
     catch(e){alert("저장하지 못했어요. 보안 규칙을 확인해 주세요.")}};
   $("#adNs").onclick=()=>saveN(true);$("#adNc").onclick=()=>saveN(false);
+  $("#adJr").onclick=async e=>{
+    const o=e.target.closest("[data-open]");
+    if(o){const r=jrs.find(x=>x.id===o.dataset.open);if(!r)return;
+      try{const b=await (await fetch(r.file)).blob();const u=URL.createObjectURL(b);const w=window.open(u,"_blank");if(!w)location.href=u}catch(x){alert("파일을 열지 못했어요.")}return}
+    const d=e.target.closest("[data-jdel]");if(!d)return;
+    if(!confirm("처리 완료로 삭제할까요? 사업자등록증 사진도 함께 지워져요."))return;
+    try{await deleteDoc(doc(db,"join_requests",d.dataset.jdel));d.closest(".jr").remove();HS.req=Math.max(0,(HS.req||1)-1)}catch(x){alert("삭제하지 못했어요.")}};
   $("#adCm").onclick=async e=>{const b=e.target.closest("[data-del]");if(!b)return;if(!confirm("이 댓글을 삭제할까요?"))return;
     try{await deleteDoc(doc(db,"comments",b.dataset.del));b.closest(".cmi").remove();ctx.listComments()}catch(x){alert("삭제하지 못했어요.")}};
 }
