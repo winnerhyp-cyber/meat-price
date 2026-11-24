@@ -1192,7 +1192,7 @@ function openImg(r,w="min"){
     ${name?`<p class="imgname">${esc(name)}</p>`:""}
     <div class="imgprice"><span class="lab2">${lab}</span> <b>${won(r[w+"_kg"])}</b>원 <span>/ Kg</span>${bdT(r,w,1)}</div>
     <a class="cta buy" href="${url}" target="_blank" rel="noopener" style="margin-top:12px">🛒 금천미트에서 이 상품 보기</a></div>`;
-  const im=bg.querySelector(".imgbox img");if(im)im.onerror=()=>{im.closest(".imgbox").innerHTML='<div class="empty">사진을 불러오지 못했어요</div>'};
+  const im=bg.querySelector(".imgbox img");if(im)im.onerror=()=>{im.closest(".imgbox").innerHTML='<div class="empty">이 상품은 등록된 사진이 없어요<br><small>아래 버튼으로 금천미트에서 확인하세요</small></div>'};
   bg.querySelector(".sh-x").onclick=close;
 }
 // 마우스 휠로 종류 버튼 줄을 가로로 넘기기 (좁은 화면에서 마우스를 쓸 때)
