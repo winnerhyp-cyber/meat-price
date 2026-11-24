@@ -75,6 +75,9 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
   #cso{column-count:2;column-gap:6mm;column-rule:1px solid #e3ded6}.ct-sec{margin:0 0 8px;break-inside:auto}
 }
 
+/* 종류 버튼: 넓은 화면은 줄바꿈해서 모두 보이게 */
+@media(min-width:760px){.chips{flex-wrap:wrap;overflow:visible}}
+.imgsheet .lab2{font-size:12px;font-weight:700;color:var(--sub);background:var(--chip);border-radius:6px;padding:2px 6px;margin-right:4px}
 /* 대표 이미지 */
 .imgb{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:baseline;gap:2px;text-decoration:underline dotted var(--mute);text-underline-offset:3px}
 .imgb .cam{font-size:10px;text-decoration:none}
@@ -712,7 +715,10 @@ const brandTxt=(r,w)=>{const b=sb(r[w+"_brand"]);const o=r[w+"_origin"];let g=r[
 const bOnly=(r,w)=>[sb(r[w+"_brand"]),r[w+"_origin"]].filter(Boolean).join("·");
 const bdT=(r,w,full)=>{const t=full?brandTxt(r,w):bOnly(r,w);return t?`<em class="bd">${esc(t)}</em>`:""};
 // 대표 이미지가 있는 최저가(세절육)는 숫자를 누르면 사진이 보임
-const imgBtn=(r,inner)=>r&&r.min_img?`<button class="imgb" data-ik="${esc(r.day+"|"+K(r.category,r.part,r.grade_f))}" title="대표 이미지 보기">${inner}<span class="cam">📷</span></button>`:inner;
+// 최저/최고 가격 숫자를 누르면 그 상품의 대표 사진·상품명이 보임 (w: "min" 또는 "max")
+const IMG_BASE="https://static.ekcm.co.kr/files/goods/";
+const imgUrl=u=>!u?"":/^https?:/.test(u)?u:IMG_BASE+u;
+const imgBtn=(r,inner,w="min")=>r&&(r[w+"_img"]||r[w+"_goods"])?`<button class="imgb" data-ik="${esc(r.day+"|"+K(r.category,r.part,r.grade_f))}" data-w="${w}" title="상품 사진 보기">${inner}${r[w+"_img"]?`<span class="cam">📷</span>`:""}</button>`:inner;
 const sortGrades=a=>[...GRADE_ORDER.filter(x=>a.includes(x)),...a.filter(x=>!GRADE_ORDER.includes(x)).sort()];
 const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const thinMark=r=>r&&r.total<=3?`<span class="thin" title="상품 ${r.total}개 (참고용)">※</span>`:"";
@@ -872,7 +878,7 @@ function mvRow(m){
   const g=m.r.grade_f==="전체"?"":m.r.grade_f;
   return `<a class="mv" href="#" data-cat="${esc(m.c)}" data-part="${esc(m.r.part)}" data-g="${esc(m.r.grade_f)}">
     <div class="mv-n"><span class="cchip" style="--c:${meta(m.c).c}">${esc(m.c)}</span><b>${esc(nm(m.r.part))}</b>${g?`<span class="g">${esc(g)}</span>`:""}${m.low?`<span class="tag low">기록 최저</span>`:""}${m.thin?`<span class="thin" title="상품 3개 이하 (참고용)">※</span>`:""}</div>
-    <div class="mv-v"><s>${won(m.o.min_kg)}</s> → <b>${won(m.r.min_kg)}</b>원${bdT(m.r,"min",1)}</div>
+    <div class="mv-v"><s>${won(m.o.min_kg)}</s> → ${imgBtn(m.r,`<b>${won(m.r.min_kg)}</b>`)}원${bdT(m.r,"min",1)}</div>
     <div class="mv-r">${badge(m.p)}${spark(s,m.p>0?"var(--up)":"var(--dn)")}</div></a>`;
 }
 function viewHome(v){
@@ -932,7 +938,7 @@ function favRows(f){
     const mv=x.moves.filter(m=>m.r.part===p);const mp=mv.length?mv.sort((a,b)=>Math.abs(b.p)-Math.abs(a.p))[0]:null;
     return `<div class="lr"><div class="pn">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}">${esc(nm(p))}</button><span class="cchip" style="--c:${meta(c).c}">${esc(c)}</span></div>
       <div class="lp"><span class="lab">최저</span>${imgBtn(lo,`<b>${won(lo.min_kg)}</b>`)}<em>${esc([lo.grade_f!=="전체"&&!lo.min_grade?lo.grade_f:"",brandTxt(lo,"min")].filter(Boolean).join(" · "))}</em></div>
-      <div class="lp x"><span class="lab">최고</span><b>${won(hi.max_kg)}</b><em>${esc([hi.grade_f!=="전체"&&!hi.max_grade?hi.grade_f:"",brandTxt(hi,"max")].filter(Boolean).join(" · "))}</em></div>
+      <div class="lp x"><span class="lab">최고</span>${imgBtn(hi,`<b>${won(hi.max_kg)}</b>`,"max")}<em>${esc([hi.grade_f!=="전체"&&!hi.max_grade?hi.grade_f:"",brandTxt(hi,"max")].filter(Boolean).join(" · "))}</em></div>
       <div>${mp?badge(mp.p):`<span class="pb eq">– 변동 없음</span>`}</div></div>`}).join("");
 }
 
@@ -961,7 +967,7 @@ function viewCats(v){
         const o=pmin(c,x.prev,p);const pc=o&&o.min_kg?pctOf(lo.min_kg,o.min_kg):null;
         const t=(r,w)=>esc([r.grade_f!=="전체"&&!r[w+"_grade"]?r.grade_f:"",brandTxt(r,w)].filter(Boolean).join(" · "));
         const tl=t(lo,"min"),th=t(hi,"max");
-        rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn">${imgBtn(lo,`<b>${won(lo.min_kg)}</b>`)}${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
+        rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn">${imgBtn(lo,`<b>${won(lo.min_kg)}</b>`)}${tl?`<em>${tl}</em>`:""}</td><td class="mx">${imgBtn(hi,won(hi.max_kg),"max")}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
       html+=`<section class="ct-sec" style="--c:${meta(c).c}"><div class="ct-h"><a href="${link(c)}"><span class="ico">${meta(c).e}</span>${esc(c)}</a><span class="d">${x.today.slice(5).replace("-","/")} · ${ps.length}개 부위</span>${x.avg!=null?`<span class="av">${CL(x)} 평균 ${badge(x.avg)}</span>`:""}<a class="more" href="${link(c)}">등급별 ›</a></div>
         <div class="card ct-t"><table class="ctb"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>부위</th><th>최저 (원/Kg)</th><th>최고</th><th>${x.wkx?"전주 대비":"변동"}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
     }
@@ -1024,7 +1030,7 @@ function tabTable(cv,c){
 function cellMM(c,p,g){
   const x=D.info[c],r=getR(c,x.today,p,g);
   if(!r)return x.seen.has(p+"|"+g)?`<span class="so">품절</span>`:`<span class="na">-</span>`;
-  return `<span class="mm"><i>저</i><span class="mn">${won(r.min_kg)}</span>${bdT(r,"min")||"<span></span>"}<i>고</i><span class="mx">${won(r.max_kg)}</span>${bdT(r,"max")||"<span></span>"}</span>${thinMark(r)}`;
+  return `<span class="mm"><i>저</i><span class="mn">${imgBtn(r,won(r.min_kg))}</span>${bdT(r,"min")||"<span></span>"}<i>고</i><span class="mx">${imgBtn(r,won(r.max_kg),"max")}</span>${bdT(r,"max")||"<span></span>"}</span>${thinMark(r)}`;
 }
 function wideTable(c,ps){
   const x=D.info[c];let last="",rows="";
@@ -1039,7 +1045,7 @@ function partCards(c,ps){
       <div class="pc-r hd"><span>등급</span><span>최저</span><span>최고</span></div>
       ${x.grades.map(gr=>{const r=getR(c,x.today,p,gr);
         if(!r)return x.seen.has(p+"|"+gr)?`<div class="pc-r"><span class="g">${esc(gr)}</span><span style="grid-column:2/4;text-align:right"><span class="so">품절</span></span></div>`:"";
-        return `<div class="pc-r"><span class="g">${esc(gr)}</span><span class="mn">${won(r.min_kg)}${thinMark(r)}${bdT(r,"min")}</span><span class="mx">${won(r.max_kg)}${bdT(r,"max")}</span></div>`}).join("")}</div>`});
+        return `<div class="pc-r"><span class="g">${esc(gr)}</span><span class="mn">${imgBtn(r,won(r.min_kg))}${thinMark(r)}${bdT(r,"min")}</span><span class="mx">${imgBtn(r,won(r.max_kg),"max")}${bdT(r,"max")}</span></div>`}).join("")}</div>`});
   return `<div class="pcs">${o}</div>`;
 }
 function listRows(c,ps,g,sort){
@@ -1053,7 +1059,7 @@ function listRows(c,ps,g,sort){
   items.forEach(({p,r})=>{const gg=grp(c,p);if(sort==="part"&&gg!==last){o+=`<div class="alg">${gg}</div>`;last=gg}
     o+=`<div class="lr"><div class="pn">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(g)}">${esc(nm(p))}</button>${thinMark(r)}</div>`+
       (r?`<div class="lp"><span class="lab">최저</span>${imgBtn(r,`<b>${won(r.min_kg)}</b>`)}<em>${esc(brandTxt(r,"min"))}</em></div>
-        <div class="lp x"><span class="lab">최고</span><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>
+        <div class="lp x"><span class="lab">최고</span>${imgBtn(r,`<b>${won(r.max_kg)}</b>`,"max")}<em>${esc(brandTxt(r,"max"))}</em></div>
         <div class="rb" title="${won(r.min_kg)} ~ ${won(r.max_kg)}"><i style="left:${(r.min_kg-lo)/sp*100}%;width:${Math.max(2,(r.max_kg-r.min_kg)/sp*100)}%"></i></div>`
       :`<div><span class="so">품절</span></div><div></div><div></div>`)+`</div>`});
   return `<div class="card list">${o}</div>`;
@@ -1075,7 +1081,7 @@ function tabCmp(cv,c){
   const mx=Math.max(...rs.map(r=>r.max_kg),1);
   $("#bars").innerHTML=rs.length?rs.map(r=>`<div class="cb"><button class="pl n" data-cat="${esc(c)}" data-part="${esc(r.part)}" data-g="${esc(r.grade_f)}" title="${esc(nm(r.part))}">${esc(nm(r.part))}</button>
     <div class="t"><i class="r" style="left:${r.min_kg/mx*100}%;width:${Math.max(.5,(r.max_kg-r.min_kg)/mx*100)}%"></i><i style="left:0;width:${r[s.cm]/mx*100}%;opacity:.9;${s.cm==="max_kg"?"background:color-mix(in srgb,var(--acc) 70%,#000)":""}"></i></div>
-    <span class="v">${won(r[s.cm])}${bdT(r,s.cm==="max_kg"?"max":"min")}</span></div>`).join(""):`<div class="empty">이 조건의 데이터가 없어요.</div>`;
+    <span class="v">${imgBtn(r,won(r[s.cm]),s.cm==="max_kg"?"max":"min")}${bdT(r,s.cm==="max_kg"?"max":"min")}</span></div>`).join(""):`<div class="empty">이 조건의 데이터가 없어요.</div>`;
 }
 
 function tabTrend(cv,c){
@@ -1159,7 +1165,7 @@ function openSheet(c,p,g0){
       <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:4px 12px;padding:0 8px 6px;font-size:11.5px;color:var(--mute);font-weight:700"><span style="min-width:3.4em">${x.origins.length?"구분":"등급"}</span><span>최저가 (원/Kg)</span><span>최고가 (원/Kg)</span></div>
       ${opts.map(g=>{const r=getR(c,x.today,p,g),o=x.prev&&getR(c,x.prev,p,g);
         return `<div class="sh-r ${g===sel?"on":""}" data-sel="${esc(g)}"><span class="g">${esc(isC(g)?g.slice(3):g)}</span>
-          ${r?`<div class="lp"><b>${imgBtn(r,won(r.min_kg))} ${o&&o.min_kg!==r.min_kg?badge(pctOf(r.min_kg,o.min_kg)):""}</b><em>${esc(brandTxt(r,"min"))}</em></div><div class="lp x"><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>`
+          ${r?`<div class="lp"><b>${imgBtn(r,won(r.min_kg))} ${o&&o.min_kg!==r.min_kg?badge(pctOf(r.min_kg,o.min_kg)):""}</b><em>${esc(brandTxt(r,"min"))}</em></div><div class="lp x"><b>${imgBtn(r,won(r.max_kg),"max")}</b><em>${esc(brandTxt(r,"max"))}</em></div>`
           :`<span><span class="so">품절</span></span><span></span>`}</div>`}).join("")}
       <div class="card-h" style="margin:16px 0 4px;font-size:15px">최근 추이 <small>${esc(isC(sel)?sel.slice(3)+"산":sel)} · 최근 30회</small></div>
       ${chart({labels:ss.map(r=>r.day),series:[{n:"최저가",c:"var(--acc)",v:ss.map(r=>r.min_kg)},{n:"최고가",c:"#9aa0a8",v:ss.map(r=>r.max_kg)}],h:190})}
@@ -1173,22 +1179,25 @@ function openSheet(c,p,g0){
 }
 
 // ───────────────────────── 대표 이미지 ─────────────────────────
-function openImg(r){
+function openImg(r,w="min"){
   const bg=document.createElement("div");bg.className="sheet-bg";bg.style.zIndex=60;document.body.appendChild(bg);
   const close=()=>{bg.remove();document.removeEventListener("keydown",k)};const k=e=>{if(e.key==="Escape")close()};document.addEventListener("keydown",k);
   bg.onclick=e=>{if(e.target===bg)close()};
-  const big=r.min_img;
-  const url=r.min_goods?"https://www.ekcm.co.kr/pd/productDetail?goodsNo="+encodeURIComponent(r.min_goods):SHOP;
-  bg.innerHTML=`<div class="sheet imgsheet" role="dialog" aria-label="대표 이미지">
-    <div class="sh-h"><h3>${esc(nm(r.part))} 최저가 상품</h3><button class="sh-x" aria-label="닫기">✕</button></div>
-    <div class="imgbox"><img src="${esc(big)}" alt="${esc(r.min_name||nm(r.part))}" referrerpolicy="no-referrer"></div>
-    ${r.min_name?`<p class="imgname">${esc(r.min_name)}</p>`:""}
-    <div class="imgprice"><b>${won(r.min_kg)}</b>원 <span>/ Kg</span>${bdT(r,"min",1)}</div>
+  const img=imgUrl(r[w+"_img"]),g=r[w+"_goods"],name=r[w+"_name"];
+  const url=g?"https://www.ekcm.co.kr/pd/productDetail?goodsNo="+encodeURIComponent(g):SHOP;
+  const lab=w==="max"?"최고가":"최저가";
+  bg.innerHTML=`<div class="sheet imgsheet" role="dialog" aria-label="상품 사진">
+    <div class="sh-h"><h3>${esc(nm(r.part))}${r.grade_f&&r.grade_f!=="전체"?" · "+esc(r.grade_f):""} ${lab} 상품</h3><button class="sh-x" aria-label="닫기">✕</button></div>
+    <div class="imgbox">${img?`<img src="${esc(img)}" alt="${esc(name||nm(r.part))}" referrerpolicy="no-referrer">`:`<div class="empty">사진은 다음 수집부터 보여요</div>`}</div>
+    ${name?`<p class="imgname">${esc(name)}</p>`:""}
+    <div class="imgprice"><span class="lab2">${lab}</span> <b>${won(r[w+"_kg"])}</b>원 <span>/ Kg</span>${bdT(r,w,1)}</div>
     <a class="cta buy" href="${url}" target="_blank" rel="noopener" style="margin-top:12px">🛒 금천미트에서 이 상품 보기</a></div>`;
-  const im=bg.querySelector(".imgbox img");im.onerror=()=>{im.closest(".imgbox").innerHTML='<div class="empty">이미지를 불러오지 못했어요</div>'};
+  const im=bg.querySelector(".imgbox img");if(im)im.onerror=()=>{im.closest(".imgbox").innerHTML='<div class="empty">사진을 불러오지 못했어요</div>'};
   bg.querySelector(".sh-x").onclick=close;
 }
-document.addEventListener("click",e=>{const b=e.target.closest("[data-ik]");if(!b)return;e.preventDefault();e.stopPropagation();const r=D.dk.get(b.dataset.ik);if(r&&r.min_img)openImg(r)},true);
+// 마우스 휠로 종류 버튼 줄을 가로로 넘기기 (좁은 화면에서 마우스를 쓸 때)
+document.addEventListener("wheel",e=>{const c=e.target.closest(".chips");if(!c||c.scrollWidth<=c.clientWidth||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;c.scrollLeft+=e.deltaY;e.preventDefault()},{passive:false});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-ik]");if(!b)return;e.preventDefault();e.stopPropagation();const r=D.dk.get(b.dataset.ik);if(r)openImg(r,b.dataset.w||"min")},true);
 
 // ───────────────────────── 연락처 QR ─────────────────────────
 const QR_SVG=`<svg class="qr" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="전화 연결 QR 코드"><rect width="100%" height="100%" fill="#fff"/><path d="M2 2h7v1h-7zM10 2h1v1h-1zM12 2h3v1h-3zM20 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM13 3h2v1h-2zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM15 4h1v1h-1zM17 4h2v1h-2zM20 4h1v1h-1zM22 4h3v1h-3zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM13 5h2v1h-2zM16 5h3v1h-3zM20 5h1v1h-1zM22 5h3v1h-3zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM15 6h2v1h-2zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h3v1h-3zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h8v1h-8zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h7v1h-7zM10 9h2v1h-2zM13 9h2v1h-2zM16 9h1v1h-1zM2 10h1v1h-1zM6 10h1v1h-1zM8 10h3v1h-3zM12 10h1v1h-1zM14 10h4v1h-4zM19 10h5v1h-5zM26 10h1v1h-1zM3 11h1v1h-1zM7 11h1v1h-1zM9 11h2v1h-2zM12 11h3v1h-3zM19 11h1v1h-1zM21 11h4v1h-4zM4 12h3v1h-3zM8 12h1v1h-1zM15 12h3v1h-3zM21 12h4v1h-4zM2 13h1v1h-1zM9 13h3v1h-3zM13 13h1v1h-1zM15 13h1v1h-1zM18 13h1v1h-1zM20 13h1v1h-1zM23 13h2v1h-2zM3 14h2v1h-2zM6 14h1v1h-1zM8 14h3v1h-3zM12 14h4v1h-4zM18 14h1v1h-1zM20 14h1v1h-1zM23 14h4v1h-4zM2 15h2v1h-2zM5 15h3v1h-3zM9 15h2v1h-2zM12 15h1v1h-1zM15 15h3v1h-3zM19 15h1v1h-1zM21 15h2v1h-2zM24 15h1v1h-1zM5 16h1v1h-1zM7 16h2v1h-2zM10 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM21 16h3v1h-3zM4 17h1v1h-1zM6 17h1v1h-1zM11 17h2v1h-2zM14 17h1v1h-1zM16 17h2v1h-2zM23 17h3v1h-3zM2 18h4v1h-4zM7 18h2v1h-2zM10 18h4v1h-4zM15 18h2v1h-2zM18 18h9v1h-9zM10 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM17 19h2v1h-2zM22 19h1v1h-1zM25 19h1v1h-1zM2 20h7v1h-7zM10 20h2v1h-2zM13 20h4v1h-4zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h3v1h-3zM2 21h1v1h-1zM8 21h1v1h-1zM11 21h3v1h-3zM15 21h1v1h-1zM17 21h2v1h-2zM22 21h3v1h-3zM26 21h1v1h-1zM2 22h1v1h-1zM4 22h3v1h-3zM8 22h1v1h-1zM10 22h2v1h-2zM14 22h2v1h-2zM18 22h8v1h-8zM2 23h1v1h-1zM4 23h3v1h-3zM8 23h1v1h-1zM11 23h2v1h-2zM15 23h3v1h-3zM20 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h3v1h-3zM8 24h1v1h-1zM12 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM24 24h2v1h-2zM2 25h1v1h-1zM8 25h1v1h-1zM11 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM19 25h2v1h-2zM23 25h3v1h-3zM2 26h7v1h-7zM10 26h1v1h-1zM13 26h1v1h-1zM15 26h2v1h-2zM20 26h7v1h-7z" fill="#000"/></svg>`;
