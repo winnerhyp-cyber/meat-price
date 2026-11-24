@@ -52,7 +52,10 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
   .brand .t-pc{display:none}.brand .t-m{display:block;flex:1;text-align:center}
 }
 
-.ct-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ct-top .btn{margin-left:auto;height:38px}
+.ct-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ct-top .btn{height:38px}.ct-top .sec-t{margin-right:auto!important}
+.ct-top .btn,.btn.favclr{white-space:nowrap}
+@media(max-width:600px){.ct-top .sec-t small{display:none}.ct-top{gap:6px}.ct-top .btn{padding:0 10px}}
+.btn.favclr{height:34px;font-size:13px;color:var(--up);border-color:color-mix(in srgb,var(--up) 35%,var(--line))}.sec-t .favclr{margin-left:auto}
 .pronly{display:none}
 .ctb td.n .st{font-size:15px;padding:0 3px 0 0;vertical-align:-1px;display:inline}
 .ctb td.n .pl{white-space:normal;display:inline;word-break:keep-all;overflow-wrap:anywhere}
@@ -788,6 +791,8 @@ const series=(c,p,g,n)=>{const a=D.key.get(K(c,p,g))||[];return n?a.slice(-n):a}
 
 // ───────────────────────── 즐겨찾기 ─────────────────────────
 function favs(){try{return JSON.parse(localStorage.getItem("fav")||"[]")}catch(e){return[]}}
+function clearFavs(){const n=favs().length;if(!n)return false;if(!confirm(`즐겨찾기 ${n}개를 모두 해제할까요?`))return false;try{localStorage.setItem("fav","[]")}catch(e){}$$(".st.on[data-fav]").forEach(b=>{b.classList.remove("on");b.textContent="☆"});return true}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-favclear]");if(!b)return;e.preventDefault();if(clearFavs())route()});
 function toggleFav(k){try{const f=favs();const i=f.indexOf(k);i<0?f.push(k):f.splice(i,1);localStorage.setItem("fav",JSON.stringify(f))}catch(e){}}
 const starBtn=(c,p)=>{const k=c+"|"+p,on=favs().includes(k);return `<button class="st ${on?"on":""}" data-fav="${esc(k)}" title="즐겨찾기" aria-label="즐겨찾기">${on?"★":"☆"}</button>`};
 document.addEventListener("click",e=>{
@@ -947,7 +952,7 @@ const CS={cat:"",q:""};
 const pmin=(c,d,p)=>{if(!d)return null;let lo=null;for(const g of D.info[c].grades){const r=getR(c,d,p,g);if(r&&(!lo||r.min_kg<lo.min_kg))lo=r}return lo};
 function viewCats(v){
   if(CS.cat&&CS.cat!=="*fav"&&!D.info[CS.cat])CS.cat="";
-  v.innerHTML=`<div class="ct-top"><div class="sec-t" style="margin:4px 0 0">📋 금천미트 단가표 <small>${CS.cat==="*fav"?"★ 즐겨찾기":CS.cat||"전체"} · Kg당 원</small></div><button class="btn noprint" id="csp"><svg class="i"><use href="#i-print"/></svg>인쇄</button></div>
+  v.innerHTML=`<div class="ct-top"><div class="sec-t" style="margin:4px 0 0">📋 금천미트 단가표 <small>${CS.cat==="*fav"?"★ 즐겨찾기":CS.cat||"전체"} · Kg당 원</small></div>${CS.cat==="*fav"&&favs().length?`<button class="btn favclr noprint" data-favclear>☆ 전체 해제</button>`:""}<button class="btn noprint" id="csp"><svg class="i"><use href="#i-print"/></svg>인쇄</button></div>
     <div class="pronly">${contactBlock()}</div>
     <div class="chips ct-chips"><a href="#" data-cs="" class="${!CS.cat?"on":""}">전체보기</a><a href="#" data-cs="*fav" class="${CS.cat==="*fav"?"on":""}">★ 즐겨찾기</a>${D.cats.map(k=>`<a href="#" data-cs="${esc(k)}" class="${k===CS.cat?"on":""}"><span class="dot" style="background:${meta(k).c}"></span>${esc(k)}</a>`).join("")}</div>
     <div id="cso"></div>
@@ -1224,7 +1229,7 @@ function viewPrint(v,onlyFav){
   v.innerHTML=`<div class="bar-tools noprint" style="margin-top:4px">
      <div class="seg" id="am"><button data-v="sum">요약 (부위당 한 줄)</button><button data-v="det">등급별 상세</button></div>
      <button class="btn pri" id="prt"><svg class="i"><use href="#i-print"/></svg>인쇄 (A4)</button></div>
-   <div class="sec-t" style="margin-top:6px">${onlyFav?"★ 즐겨찾기 모아보기":"📋 전체 단가표"}<small>${n?n+"개 부위":""}</small></div>
+   <div class="sec-t" style="margin-top:6px">${onlyFav?"★ 즐겨찾기 모아보기":"📋 전체 단가표"}<small>${n?n+"개 부위":""}</small>${onlyFav&&f.length?`<button class="btn favclr noprint" data-favclear>☆ 전체 해제</button>`:""}</div>
    ${onlyFav?"":contactBlock()}
    <div class="prv ${AM}">${secs||`<div class="card empty">${onlyFav?"즐겨찾기한 부위가 없어요.<br>각 종류의 단가표에서 부위 앞의 ☆를 눌러 추가해 보세요.":"데이터가 없습니다"}</div>`}</div>
    <div class="note noprint">요약은 부위마다 등급·원산지와 상관없이 가장 싼 값과 가장 비싼 값을 한 줄로 보여줘요. 즐겨찾기는 이 기기(브라우저)에만 저장돼요.</div>`;
