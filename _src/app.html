@@ -26,7 +26,7 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-/* ── 단가표 한눈에 ── */
+/* ── 금천미트 단가표 ── */
 .ct-chips{margin-bottom:10px}
 .ct-sec{margin:16px 0 0}
 .ct-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 2px 8px;font-size:16px;font-weight:800}
@@ -49,8 +49,29 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .brand .t-m{display:none}
 @media(max-width:1023px){
   .top .brand{flex:1 1 100%;justify-content:center;position:relative;gap:6px}
-  .brand img.ld{order:-1}
   .brand .t-pc{display:none}.brand .t-m{display:block;flex:1;text-align:center}
+}
+
+.ct-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ct-top .btn{margin-left:auto;height:38px}
+.pronly{display:none}
+.ctb td.n .st{font-size:15px;padding:0 3px 0 0;vertical-align:-1px}
+/* 종류 제목은 내려도 위에 고정 */
+.ct-h{position:sticky;top:0;z-index:6;background:var(--bg);padding:9px 2px 7px;margin:0 -2px 6px!important;box-shadow:0 1px 0 var(--line)}
+@media(max-width:600px){.ct-h{flex-wrap:nowrap;white-space:nowrap}.ct-h .d{display:none}.ct-h>a:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.ct-h .av{font-size:11.5px}}
+.bd{font-style:normal;font-size:10.5px;color:var(--mute);font-weight:600;white-space:normal;word-break:keep-all}
+.mm{grid-template-columns:auto auto auto!important}.mm .bd{text-align:left;max-width:7.5em;line-height:1.2}
+.pc-r .mn .bd,.pc-r .mx .bd{display:block;line-height:1.2;margin-top:1px}
+.mv-v .bd{margin-left:6px}
+.cb .v .bd{display:block;text-align:right}
+@media print{
+  .pronly{display:block}.ct-top .btn{display:none}
+  .ct-h{position:static;box-shadow:none;padding:2px 0;font-size:12.5px;break-after:avoid;background:none}
+  .ct-h .more{display:none}
+  .card.ct-t{border:1px solid #ddd8d0;border-radius:6px}
+  .ctb{font-size:9.5px}.ctb th{font-size:8.5px;padding:3px 5px}.ctb td{padding:3px 5px}
+  .ctb td.mn b{font-size:10.5px}.ctb td.mx{font-size:9.5px}.ctb td.n .pl{font-size:10px}
+  .ctb td.mn em,.ctb td.mx em{font-size:7.5px}.ctb tr{break-inside:avoid}.ctb td.w .pb{font-size:8.5px}
+  #cso{column-count:2;column-gap:6mm;column-rule:1px solid #e3ded6}.ct-sec{margin:0 0 8px;break-inside:auto}
 }
 
 /* ── 홈 상단 숫자 · 바로가기 · 가입 요청 ── */
@@ -66,7 +87,8 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .cta{display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px;border-radius:16px;font-size:16.5px;font-weight:800;text-align:center;padding:10px 14px}
 .cta.buy{background:#17402f;color:#fff;box-shadow:var(--sh)}
 .cta.out{border:1.5px solid #17402f;background:#f4f7f4;color:#17402f;margin-top:14px}
-.cta.go{background:var(--acc);color:#fff;margin-top:10px;min-height:52px;font-size:16px}
+.cta.go{background:var(--acc);color:#fff;margin-top:12px;min-height:54px;font-size:16.5px}
+.jdiv{height:1px;background:var(--line);margin:20px 0 18px}
 .cta.call{background:#fee500;color:#191919}.cta.sms{background:var(--card);border:1px solid var(--line);color:var(--ink)}
 @media (prefers-color-scheme:dark){.cta.buy{background:#2c6b50}.cta.out{background:transparent;border-color:#5fae8a;color:#8fd3b3}}
 .join1{text-align:center}.join1 h3{margin:0 0 4px;font-size:18px}
@@ -448,7 +470,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
   <aside class="side">
     <div class="side-title">도매 단가표</div>
     <a href="#/" data-nav="home"><svg class="i"><use href="#i-home"/></svg>홈</a>
-    <a href="#/cats" data-nav="cats"><svg class="i"><use href="#i-list"/></svg>단가표 한눈에</a>
+    <a href="#/cats" data-nav="cats"><svg class="i"><use href="#i-list"/></svg>금천미트 단가표</a>
     <a href="#/moves" data-nav="moves"><svg class="i"><use href="#i-trend"/></svg>변동 모니터</a>
     <a href="#/fav" data-nav="fav"><svg class="i"><use href="#i-star"/></svg>즐겨찾기</a>
     <a href="#/all" data-nav="all"><svg class="i"><use href="#i-print"/></svg>전체 단가표 · 인쇄</a>
@@ -673,6 +695,8 @@ const badge=p=>p==null?"":`<span class="pb ${p>0.05?"up":p<-0.05?"dn":"eq"}">${p
 const sb=b=>b?String(b).replace(/한우$/,"").replace(/대한으로$/,"").replace(/\(.*\)$/,"").trim():"";
 const brandTxt=(r,w)=>{const b=sb(r[w+"_brand"]);const o=r[w+"_origin"];let g=r[w+"_grade"];
   return [b,[o,g].filter(Boolean).join("·")].filter(Boolean).join(" · ")};
+const bOnly=(r,w)=>[sb(r[w+"_brand"]),r[w+"_origin"]].filter(Boolean).join("·");
+const bdT=(r,w,full)=>{const t=full?brandTxt(r,w):bOnly(r,w);return t?`<em class="bd">${esc(t)}</em>`:""};
 const sortGrades=a=>[...GRADE_ORDER.filter(x=>a.includes(x)),...a.filter(x=>!GRADE_ORDER.includes(x)).sort()];
 const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const thinMark=r=>r&&r.total<=3?`<span class="thin" title="상품 ${r.total}개 (참고용)">※</span>`:"";
@@ -830,7 +854,7 @@ function mvRow(m){
   const g=m.r.grade_f==="전체"?"":m.r.grade_f;
   return `<a class="mv" href="#" data-cat="${esc(m.c)}" data-part="${esc(m.r.part)}" data-g="${esc(m.r.grade_f)}">
     <div class="mv-n"><span class="cchip" style="--c:${meta(m.c).c}">${esc(m.c)}</span><b>${esc(nm(m.r.part))}</b>${g?`<span class="g">${esc(g)}</span>`:""}${m.low?`<span class="tag low">기록 최저</span>`:""}${m.thin?`<span class="thin" title="상품 3개 이하 (참고용)">※</span>`:""}</div>
-    <div class="mv-v"><s>${won(m.o.min_kg)}</s> → <b>${won(m.r.min_kg)}</b>원</div>
+    <div class="mv-v"><s>${won(m.o.min_kg)}</s> → <b>${won(m.r.min_kg)}</b>원${bdT(m.r,"min",1)}</div>
     <div class="mv-r">${badge(m.p)}${spark(s,m.p>0?"var(--up)":"var(--dn)")}</div></a>`;
 }
 function viewHome(v){
@@ -898,28 +922,32 @@ function favRows(f){
 const CS={cat:"",q:""};
 const pmin=(c,d,p)=>{if(!d)return null;let lo=null;for(const g of D.info[c].grades){const r=getR(c,d,p,g);if(r&&(!lo||r.min_kg<lo.min_kg))lo=r}return lo};
 function viewCats(v){
-  if(CS.cat&&!D.info[CS.cat])CS.cat="";
-  v.innerHTML=`<div class="chips ct-chips"><a href="#" data-cs="" class="${!CS.cat?"on":""}">전체보기</a>${D.cats.map(k=>`<a href="#" data-cs="${esc(k)}" class="${k===CS.cat?"on":""}"><span class="dot" style="background:${meta(k).c}"></span>${esc(k)}</a>`).join("")}</div>
+  if(CS.cat&&CS.cat!=="*fav"&&!D.info[CS.cat])CS.cat="";
+  v.innerHTML=`<div class="ct-top"><div class="sec-t" style="margin:4px 0 0">📋 금천미트 단가표 <small>${CS.cat==="*fav"?"★ 즐겨찾기":CS.cat||"전체"} · Kg당 원</small></div><button class="btn noprint" id="csp"><svg class="i"><use href="#i-print"/></svg>인쇄</button></div>
+    <div class="pronly">${contactBlock()}</div>
+    <div class="chips ct-chips"><a href="#" data-cs="" class="${!CS.cat?"on":""}">전체보기</a><a href="#" data-cs="*fav" class="${CS.cat==="*fav"?"on":""}">★ 즐겨찾기</a>${D.cats.map(k=>`<a href="#" data-cs="${esc(k)}" class="${k===CS.cat?"on":""}"><span class="dot" style="background:${meta(k).c}"></span>${esc(k)}</a>`).join("")}</div>
     <div id="cso"></div>
     <div class="note">굵은 숫자가 Kg당 <b>최저가</b>, 회색이 최고가예요(등급 중 가장 싼 값 / 가장 비싼 값). 오른쪽은 최저가의 ${GCL()} 변동이에요. 부위를 누르면 등급별 가격을 볼 수 있어요.</div>`;
+  $("#csp").onclick=()=>window.print();
   v.querySelector(".ct-chips").onclick=e=>{const a=e.target.closest("[data-cs]");if(!a)return;e.preventDefault();CS.cat=a.dataset.cs;viewCats(v)};
   const draw=()=>{
     let html="";
-    for(const c of (CS.cat?[CS.cat]:D.cats)){
-      const x=D.info[c];const ps=x.parts.filter(p=>!CS.q||nm(p).includes(CS.q));if(!ps.length)continue;
+    const fv=CS.cat==="*fav"?favs():null;
+    for(const c of (CS.cat&&!fv?[CS.cat]:D.cats)){
+      const x=D.info[c];const ps=x.parts.filter(p=>(!CS.q||nm(p).includes(CS.q))&&(!fv||fv.includes(c+"|"+p)));if(!ps.length)continue;
       let last="",rows="";
       ps.forEach(p=>{const g=grp(c,p);if(g!==last&&ps.length>6){rows+=`<tr class="gr"><td colspan="4">${g}</td></tr>`;last=g}
         const rs=x.todayRows.filter(r=>r.part===p&&!isC(r.grade_f));
-        if(!rs.length){rows+=`<tr><td class="n"><button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}">${esc(nm(p))}</button></td><td colspan="3"><span class="so">품절</span></td></tr>`;return}
+        if(!rs.length){rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}">${esc(nm(p))}</button></td><td colspan="3"><span class="so">품절</span></td></tr>`;return}
         const lo=rs.reduce((a,b)=>b.min_kg<a.min_kg?b:a),hi=rs.reduce((a,b)=>b.max_kg>a.max_kg?b:a);
         const o=pmin(c,x.prev,p);const pc=o&&o.min_kg?pctOf(lo.min_kg,o.min_kg):null;
         const t=(r,w)=>esc([r.grade_f!=="전체"&&!r[w+"_grade"]?r.grade_f:"",brandTxt(r,w)].filter(Boolean).join(" · "));
         const tl=t(lo,"min"),th=t(hi,"max");
-        rows+=`<tr><td class="n"><button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn"><b>${won(lo.min_kg)}</b>${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
+        rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn"><b>${won(lo.min_kg)}</b>${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
       html+=`<section class="ct-sec" style="--c:${meta(c).c}"><div class="ct-h"><a href="${link(c)}"><span class="ico">${meta(c).e}</span>${esc(c)}</a><span class="d">${x.today.slice(5).replace("-","/")} · ${ps.length}개 부위</span>${x.avg!=null?`<span class="av">${CL(x)} 평균 ${badge(x.avg)}</span>`:""}<a class="more" href="${link(c)}">등급별 ›</a></div>
         <div class="card ct-t"><table class="ctb"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>부위</th><th>최저 (원/Kg)</th><th>최고</th><th>${x.wkx?"전주 대비":"변동"}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
     }
-    $("#cso").innerHTML=html||`<div class="card empty">조건에 맞는 부위가 없어요.</div>`;
+    $("#cso").innerHTML=html||`<div class="card empty">${fv?"즐겨찾기한 부위가 없어요.<br>부위 이름 앞의 ☆를 눌러 추가해 보세요.":"조건에 맞는 부위가 없어요."}</div>`;
   };draw();
 }
 
@@ -978,7 +1006,7 @@ function tabTable(cv,c){
 function cellMM(c,p,g){
   const x=D.info[c],r=getR(c,x.today,p,g);
   if(!r)return x.seen.has(p+"|"+g)?`<span class="so">품절</span>`:`<span class="na">-</span>`;
-  return `<span class="mm"><i>저</i><span class="mn">${won(r.min_kg)}</span><i>고</i><span class="mx">${won(r.max_kg)}</span></span>${thinMark(r)}`;
+  return `<span class="mm"><i>저</i><span class="mn">${won(r.min_kg)}</span>${bdT(r,"min")||"<span></span>"}<i>고</i><span class="mx">${won(r.max_kg)}</span>${bdT(r,"max")||"<span></span>"}</span>${thinMark(r)}`;
 }
 function wideTable(c,ps){
   const x=D.info[c];let last="",rows="";
@@ -993,7 +1021,7 @@ function partCards(c,ps){
       <div class="pc-r hd"><span>등급</span><span>최저</span><span>최고</span></div>
       ${x.grades.map(gr=>{const r=getR(c,x.today,p,gr);
         if(!r)return x.seen.has(p+"|"+gr)?`<div class="pc-r"><span class="g">${esc(gr)}</span><span style="grid-column:2/4;text-align:right"><span class="so">품절</span></span></div>`:"";
-        return `<div class="pc-r"><span class="g">${esc(gr)}</span><span class="mn">${won(r.min_kg)}${thinMark(r)}</span><span class="mx">${won(r.max_kg)}</span></div>`}).join("")}</div>`});
+        return `<div class="pc-r"><span class="g">${esc(gr)}</span><span class="mn">${won(r.min_kg)}${thinMark(r)}${bdT(r,"min")}</span><span class="mx">${won(r.max_kg)}${bdT(r,"max")}</span></div>`}).join("")}</div>`});
   return `<div class="pcs">${o}</div>`;
 }
 function listRows(c,ps,g,sort){
@@ -1029,7 +1057,7 @@ function tabCmp(cv,c){
   const mx=Math.max(...rs.map(r=>r.max_kg),1);
   $("#bars").innerHTML=rs.length?rs.map(r=>`<div class="cb"><button class="pl n" data-cat="${esc(c)}" data-part="${esc(r.part)}" data-g="${esc(r.grade_f)}" title="${esc(nm(r.part))}">${esc(nm(r.part))}</button>
     <div class="t"><i class="r" style="left:${r.min_kg/mx*100}%;width:${Math.max(.5,(r.max_kg-r.min_kg)/mx*100)}%"></i><i style="left:0;width:${r[s.cm]/mx*100}%;opacity:.9;${s.cm==="max_kg"?"background:color-mix(in srgb,var(--acc) 70%,#000)":""}"></i></div>
-    <span class="v">${won(r[s.cm])}</span></div>`).join(""):`<div class="empty">이 조건의 데이터가 없어요.</div>`;
+    <span class="v">${won(r[s.cm])}${bdT(r,s.cm==="max_kg"?"max":"min")}</span></div>`).join(""):`<div class="empty">이 조건의 데이터가 없어요.</div>`;
 }
 
 function tabTrend(cv,c){
@@ -1227,11 +1255,13 @@ function ctaHTML(){
   return `<a class="cta buy" href="${SHOP}" target="_blank" rel="noopener">🛒 금천미트 구매하러 바로가기</a>
   <div class="card join1">
     <h3>금천미트 처음 이용하시나요?</h3>
-    <p class="sub">회원가입 때 '가입경로 상세'에 <b>${REF}</b>을 적으면 쿠폰을 드려요</p>
-    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
     <a class="cta go" href="${JOINURL}" target="_blank" rel="noopener">👉 금천미트 가입하러 가기</a>
-    <a class="cta out" href="#/join">📝 금천미트 아이디 생성 요청</a>
-    <p class="sub" style="margin:8px 0 0">사업자등록증과 휴대폰 번호를 보내주시면 아이디를 만들어 연락드려요</p>
+    <p class="sub" style="margin:12px 0 10px">회원가입 때 '가입경로 상세'에 <b>${REF}</b>을 적으면 쿠폰을 드려요</p>
+    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
+    <div class="jdiv"></div>
+    <h3>가입이 어려우신가요?</h3>
+    <p class="sub">사업자등록증과 휴대폰 번호를 보내주시면 아이디를 만들어 연락드려요</p>
+    <a class="cta out" href="#/join" style="margin-top:0">📝 금천미트 아이디 생성 요청</a>
   </div>`;
 }
 function bindCTA(){$$("[data-copy]").forEach(b=>b.onclick=copyRef)}
@@ -1246,12 +1276,12 @@ function viewJoin(v){
   <div style="margin-top:12px">${contactBlock()}</div>
   <a class="cta buy" href="${SHOP}" target="_blank" rel="noopener" style="margin-top:10px">🛒 금천미트 구매하러 바로가기</a>
   <div class="card join1" style="margin-top:14px">
-    <h3>가입할 때 쿠폰 받기</h3>
-    <p class="sub">금천미트 회원가입 화면의 '가입경로 상세'에 아래처럼 적어주세요</p>
-    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
+    <h3>금천미트 처음 이용하시나요?</h3>
     <a class="cta go" href="${JOINURL}" target="_blank" rel="noopener">👉 금천미트 가입하러 가기</a>
+    <p class="sub" style="margin:12px 0 10px">회원가입 화면의 '가입경로 상세'에 아래처럼 적으면 쿠폰을 드려요</p>
+    <div class="refbox"><b>가입경로 상세 → ${REF}</b><button class="lnk" data-copy>${REF} 복사</button></div>
   </div>
-  <div class="sec-t">📝 금천미트 아이디 생성 요청</div>
+  <div class="sec-t">📝 가입이 어려우신가요? 아이디 생성 요청</div>
   <form class="card jf" id="jf" autocomplete="on">
     <p class="sub" style="margin:0 0 14px">직접 가입하기 어려우시면 아래를 보내주세요. 확인 후 아이디를 만들어 휴대폰으로 연락드려요.</p>
     <label class="fl">휴대폰 번호 <em>필수</em></label>
