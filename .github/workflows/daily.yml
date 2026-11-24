@@ -2,7 +2,8 @@ name: daily-collect
 
 on:
   schedule:
-    - cron: "0 20 * * *"  # 매일 한국시간 오전 5시 (UTC 전날 20시)
+    - cron: "0 21 * * *"  # 매일 한국시간 오전 6시 (UTC 전날 21시)
+    - cron: "0 9 * * *"   # 매일 한국시간 오후 6시 (UTC 9시)
   workflow_dispatch:        # 수동 실행 버튼
     inputs:
       cats:
@@ -20,6 +21,11 @@ on:
 
 env:
   TZ: Asia/Seoul   # 날짜를 한국 기준으로 기록
+
+# 수집이 겹치면 앞의 것이 끝난 뒤에 이어서 실행 (화면 저장이 서로 부딪히지 않게)
+concurrency:
+  group: daily-collect
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -49,7 +55,7 @@ jobs:
           print("cats=" + json.dumps(cats, ensure_ascii=False))
           EOF
 
-  # 2) 카테고리마다 따로, 동시에 수집 (한 번에 최대 4개씩)
+  # 2) 카테고리마다 따로, 동시에 수집 (한 번에 최대 8개씩)
   collect:
     needs: plan
     if: ${{ needs.plan.outputs.cats != '[]' }}
@@ -57,7 +63,7 @@ jobs:
     timeout-minutes: 350
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 8
       matrix:
         cat: ${{ fromJSON(needs.plan.outputs.cats) }}
     steps:
