@@ -535,6 +535,43 @@ def click_country(page, country):
     return r
 
 
+JS_GOODS_IMG = """async (nos) => {
+  const out = {};
+  for (let i = 0; i < nos.length; i += 40) {
+    try {
+      const r = await fetch("https://gw.ekcm.co.kr/api/goods/v1/goods/goodsList?goodsNoList=" + nos.slice(i, i + 40).join(",") + "&aplyPsbMediaCd=01");
+      const j = await r.json();
+      for (const g of (j.payload || [])) if (g.goodsNo && g.goodsImgUrl) out[g.goodsNo] = g.goodsImgUrl;
+    } catch (e) {}
+  }
+  return out;
+}"""
+
+
+def fix_images(page, con, day, cat):
+    """사이트 상품정보에서 진짜 대표 사진 주소를 받아 덮어씀 (목록에 사진이 없거나 주소 규칙이 다른 상품용)"""
+    rows = con.execute("SELECT part, grade_f, min_goods, max_goods FROM price_range WHERE day=? AND category=? AND total>0",
+                       (day, cat)).fetchall()
+    nos = sorted({g for r in rows for g in (r[2], r[3]) if g})
+    if not nos:
+        return
+    try:
+        imgs = page.evaluate(JS_GOODS_IMG, nos) or {}
+    except Exception as e:
+        print(f"  (사진 주소 받기 실패: {str(e)[:100]})")
+        return
+    short = lambda u: u[len("files/goods/"):] if u.startswith("files/goods/") else short_img(u)
+    for part, grade, mg, xg in rows:
+        if mg in imgs:
+            con.execute("UPDATE price_range SET min_img=? WHERE day=? AND category=? AND part=? AND grade_f=?",
+                        (short(imgs[mg]), day, cat, part, grade))
+        if xg in imgs:
+            con.execute("UPDATE price_range SET max_img=? WHERE day=? AND category=? AND part=? AND grade_f=?",
+                        (short(imgs[xg]), day, cat, part, grade))
+    con.commit()
+    print(f"  대표 사진 주소 {len(imgs)}/{len(nos)}개 확인", flush=True)
+
+
 def run_category(page, con, day, cat, cfg, only, resume):
     countries = cfg.get("countries") or [None]
     group = cfg.get("group")
@@ -652,6 +689,8 @@ def run_category(page, con, day, cat, cfg, only, resume):
                 print(f"  {dbcat}/{part}/{grade}: 최저 {lo['price_kg']:,} ({lo['brand']}) / 최고 {hi['price_kg']:,} ({hi['brand']})  [{total}건]{note}", flush=True)
                 time.sleep(random.uniform(*DELAY))
         export_latest(con, day)                                  # 부위마다 중간 저장
+    fix_images(page, con, day, cat)                              # 진짜 대표 사진 주소로 덮어쓰기
+    export_latest(con, day)
 
 
 def collect(show=False, resume=False, only=None, cats=None):
