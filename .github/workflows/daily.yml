@@ -14,7 +14,7 @@ on:
         type: string
         default: ""
       quick:
-        description: "빠른 시험 (수집을 건너뛰고 화면/비밀번호만 만들기)"
+        description: "빠른 시험 (수집을 건너뛰고 화면/입장코드만 만들기)"
         type: boolean
         default: false
 
@@ -143,10 +143,10 @@ jobs:
           python build.py
           npx -y staticrypt@3 plain.html -p "$SITE_PASSWORD" --short --remember 30 -d out \
             --template-title "동원 금천미트 도매 단가표" \
-            --template-instructions "비밀번호를 입력해 주세요" \
-            --template-button "열기" \
-            --template-placeholder "비밀번호" \
-            --template-error "비밀번호가 맞지 않아요"
+            --template-instructions "입장코드를 입력해 주세요" \
+            --template-button "입장하기" \
+            --template-placeholder "입장코드" \
+            --template-error "입장코드가 맞지 않아요"
           test -s out/plain.html
           cp out/plain.html index.html
           if [ -f pwa_inject.py ]; then python pwa_inject.py index.html; fi
