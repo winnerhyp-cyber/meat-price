@@ -28,6 +28,13 @@ for d in sorted(glob.glob(os.path.join(base_dir, "*"))):
         continue
     rows = load(os.path.join(d, "latest.json"), [])
     mine = [r for r in rows if r.get("category") == cat or (r.get("category") or "").startswith(cat + "(")]
+    if mine and os.path.exists(os.path.join(d, "full.txt")):   # 전체 수집이면 그날 이 종류의 예전 값(이름 바뀐 부위·품절 부위)을 지움
+        days = {r["day"] for r in mine}
+        same = lambda k: k[0] in days and (k[1] == cat or k[1].startswith(cat + "("))
+        for k in [k for k in H if same(k)]:
+            del H[k]
+        for k in [k for k in full if same(k)]:
+            del full[k]
     for r in mine:
         H[K(r)] = {k: r.get(k) for k in HIST_KEEP}
         full[K(r)] = r

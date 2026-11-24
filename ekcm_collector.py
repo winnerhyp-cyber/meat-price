@@ -54,10 +54,13 @@ CATEGORIES = {
     "계육": {"url": SUB + "814724", "grades": ["전체"], "nograde": True, "groups": ["국내산 냉장", "국내산 냉동", "수입계육"]},
     "양육": {"url": SUB + "62", "grades": ["전체"], "nograde": True, "groups": ["냉장", "냉동"]},
     "염소": {"url": SUB + "813594", "grades": ["전체"], "nograde": True, "groups": ["국내염소", "수입염소", "수입 미박염소"]},
-    # 세절육: 축종/부위별 화면의 "냉동" 묶음만. 최저가 상품의 대표 이미지·상품명도 저장
-    "세절육": {"url": SUB + "813284", "grades": ["전체"], "nograde": True, "group": "냉동", "img": True},
+    # 세절육: 축종/부위별 → 한우·한돈·수입우육·수입돈육 화면을 차례로 열어 "냉동" 묶음만 수집
+    #  (같은 부위 이름이 여러 축종에 있으면 "등심(한돈)"처럼 저장, 부위 묶음(pgrp)=축종)
+    "세절육": {"url": SUB + "813284", "grades": ["전체"], "nograde": True, "group": "냉동",
+            "subs": [("한우", SUB + "813294"), ("한돈", SUB + "813295"), ("수입우육", SUB + "813296"), ("수입돈육", SUB + "813297")]},
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
+IMG_BASE = "https://static.ekcm.co.kr/files/goods/"     # 상품 사진 주소 앞부분 (용량 줄이려고 뒷부분만 저장)
 DELAY = (0.3, 0.8)                  # 조합 사이 대기(초)
 DB = "prices.db"
 KNOWN_BRANDS = ["대한사람대한으로", "도축장집아들들", "금천한우", "성신한우", "과연한우", "안심한우",
@@ -145,6 +148,13 @@ def parse_list(html):
     return total, rows
 
 
+def short_img(u):
+    """상품 사진 주소: 공통 앞부분을 떼고 저장 (화면에서 다시 붙임)"""
+    if not u:
+        return None
+    return u[len(IMG_BASE):] if u.startswith(IMG_BASE) else u
+
+
 def top_pair(rows):
     """정렬된 목록에서 (전체 기준 1위, 명품 제외 기준 1위)"""
     if not rows:
@@ -169,9 +179,9 @@ COLS = ["day", "category", "part", "grade_f", "total",
         "max_kg", "max_goods", "max_brand", "max_grade",      # 최고가 (명품 제외)
         "min_all_kg", "max_all_kg",                           # 참고: 명품 포함 최저/최고
         "min_origin", "max_origin",                           # 최저/최고 상품의 원산지(수입육)
-        "pgrp", "min_img", "min_name"]                        # 부위 묶음(사이트 소제목), 최저가 상품 이미지·이름(세절육)
+        "pgrp", "min_img", "min_name", "max_img", "max_name"] # 부위 묶음(사이트 소제목), 최저/최고 상품 사진·이름
 TEXT_COLS = {"day", "category", "part", "grade_f", "min_goods", "min_brand", "min_grade",
-             "max_goods", "max_brand", "max_grade", "min_origin", "max_origin", "pgrp", "min_img", "min_name"}
+             "max_goods", "max_brand", "max_grade", "min_origin", "max_origin", "pgrp", "min_img", "min_name", "max_img", "max_name"}
 
 
 def init_db(con):
@@ -532,19 +542,26 @@ def run_category(page, con, day, cat, cfg, only, resume):
             [day] + names)}
         print(f"이어서 수집: {cat} 오늘 이미 받은 {len(done)}건은 건너뜁니다")
     print(f"\n===== {cat} =====", flush=True)
-    enter_list(page, cfg["url"])
     groups = cfg.get("groups") or [group]
-    plan = []                                              # (묶음, 사이트 부위 이름, 저장할 이름)
-    for g in groups:
-        for p in discover_parts(page, g):
-            plan.append((g, p))
-    dup = {p for _, p in plan if sum(1 for _, q in plan if q == p) > 1}
-    plan = [(g, p, f"{p}({g})" if p in dup else p) for g, p in plan]
-    plan = [x for x in plan if (not only or x[1] in only or x[2] in only)]
+    subs = cfg.get("subs") or [(None, cfg["url"])]           # 세절육: 축종별 화면을 차례로
+    plan = []                                              # (축종, 주소, 묶음, 사이트 부위 이름)
+    for lab, url in subs:
+        enter_list(page, url)
+        for g in groups:
+            for p in discover_parts(page, g):
+                plan.append((lab, url, g, p))
+    cur = subs[-1][1]
+    names = [x[3] for x in plan]
+    dup = {p for p in names if names.count(p) > 1}
+    plan = [(lab, url, g, p, f"{p}({lab or g})" if p in dup else p) for lab, url, g, p in plan]
+    plan = [x for x in plan if (not only or x[3] in only or x[4] in only)]
     print(f"{cat}: 수집할 부위 {len(plan)}개", flush=True)
-    for group, site_part, part in plan:
+    for lab, url, group, site_part, part in plan:
         print(f"[부위] {part}", flush=True)
         try:
+            if url != cur:                                 # 다른 축종 화면으로 이동
+                enter_list(page, url)
+                cur = url
             expect = click_part(page, site_part, group)
             shown = page.evaluate("() => (document.querySelector('.list-wrap .total')||{}).textContent")
             if expect is not None and not group and str(expect) != (shown or "").replace(",", ""):
@@ -615,9 +632,9 @@ def run_category(page, con, day, cat, cfg, only, resume):
                     continue
                 if lo["price_kg"] > hi["price_kg"]:
                     print(f"[주의] {part}/{grade}: 정렬이 반대로 적용됨(최저>최고). 확인 필요")
-                rec = {"day": day, "part": part, "grade_f": grade, "total": total, "pgrp": group,
-                       "min_img": lo.get("img") if cfg.get("img") else None,
-                       "min_name": lo.get("name") if cfg.get("img") else None,
+                rec = {"day": day, "part": part, "grade_f": grade, "total": total, "pgrp": lab or group,
+                       "min_img": short_img(lo.get("img")), "min_name": lo.get("name"),
+                       "max_img": short_img(hi.get("img")), "max_name": hi.get("name"),
                        "min_kg": lo["price_kg"], "min_goods": lo["goods_no"], "min_brand": lo["brand"], "min_grade": lo["grade"],
                        "max_kg": hi["price_kg"], "max_goods": hi["goods_no"], "max_brand": hi["brand"], "max_grade": hi["grade"],
                        "min_all_kg": lo_all["price_kg"], "max_all_kg": hi_all["price_kg"],
