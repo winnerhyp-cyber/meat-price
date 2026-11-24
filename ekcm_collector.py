@@ -114,8 +114,13 @@ def parse_row(li):
     trace = li.select_one("div.pd-row.rg .value > span")
     made = li.select_one("div.pd-row.md .value > p")
     img = li.select_one(".thumbnail img")
+    src = (img.get("src") or "").strip() if img else ""
+    if not src and a:                                       # 목록에 사진이 없는 화면(한우·한돈 등): 상품코드로 대표 사진 주소를 만듦
+        ac = re.search(r"artcCd=(\d+)", a.get("href", ""))
+        if ac:
+            src = IMG_BASE + "2024/01/01/" + ac.group(1) + ".jpg"
     return {
-        "img": (img.get("src") or "").strip() or None if img else None,
+        "img": src or None,
         "goods_no": gno,
         "name": name,
         "brand": _brand(name, _txt(li, ".value.brand span.show-mo")),
@@ -542,6 +547,9 @@ def run_category(page, con, day, cat, cfg, only, resume):
             [day] + names)}
         print(f"이어서 수집: {cat} 오늘 이미 받은 {len(done)}건은 건너뜁니다")
     print(f"\n===== {cat} =====", flush=True)
+    if not resume and not only:                            # 전체 수집: 오늘 이 종류의 예전 값(이름 바뀐 부위·품절 부위)을 먼저 지움
+        con.execute("DELETE FROM price_range WHERE day=? AND category=?", (day, cat))
+        con.commit()
     groups = cfg.get("groups") or [group]
     subs = cfg.get("subs") or [(None, cfg["url"])]           # 세절육: 축종별 화면을 차례로
     plan = []                                              # (축종, 주소, 묶음, 사이트 부위 이름)
