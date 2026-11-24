@@ -1,4 +1,4 @@
-"""금천미트(ekcm.co.kr) 단가 수집기 — 카테고리·부위·등급별 Kg당 최저/최고 (한우 거세/암소, 육우 거세/암소)
+"""금천미트(ekcm.co.kr) 단가 수집기 — 카테고리·부위·등급별 Kg당 최저/최고 (한우·육우·돈육·수입육·계육·양육·염소·세절육)
 
 사용법
   python ekcm_collector.py                  전체 수집 (오늘 날짜로 저장)
@@ -50,6 +50,12 @@ CATEGORIES = {
     "수입냉장돈육": {"url": SUB + "51", "grades": ["전체"], "nograde": True, "group": "냉장", "countries": "auto"},
     "수입냉동돈육": {"url": SUB + "52", "grades": ["전체"], "nograde": True, "group": "냉동", "countries": "auto"},
     "수입냉동우육": {"url": SUB + "42", "grades": ["전체"], "nograde": True, "group": "냉동", "countries": ["미국", "호주"]},
+    # 아래 4개: 등급 없음. "groups" = 사이트 부위 목록의 묶음(소제목) 중 수집할 것만. 같은 이름이 두 묶음에 있으면 "이름(묶음)"으로 저장
+    "계육": {"url": SUB + "814724", "grades": ["전체"], "nograde": True, "groups": ["국내산 냉장", "국내산 냉동", "수입계육"]},
+    "양육": {"url": SUB + "62", "grades": ["전체"], "nograde": True, "groups": ["냉장", "냉동"]},
+    "염소": {"url": SUB + "813594", "grades": ["전체"], "nograde": True, "groups": ["국내염소", "수입염소", "수입 미박염소"]},
+    # 세절육: 축종/부위별 화면의 "냉동" 묶음만. 최저가 상품의 대표 이미지·상품명도 저장
+    "세절육": {"url": SUB + "813284", "grades": ["전체"], "nograde": True, "group": "냉동", "img": True},
 }
 SORT_LOW, SORT_HIGH = "Kg당 가격 낮은 순", "Kg당 가격 높은 순"
 DELAY = (0.3, 0.8)                  # 조합 사이 대기(초)
@@ -92,7 +98,7 @@ def parse_row(li):
     if price_kg is None or not name:
         raise ValueError("가격/상품명을 못 읽음")
     origin = None                                           # 원산지 (수입육): "원산지/등급" 칸의 앞 글자 (예: 호주)
-    for xs in li.select("div.pd-row.xs"):
+    for xs in li.select("div.pd-row"):
         lab = xs.select_one(".label")
         if lab and "원산지" in lab.get_text():
             v = xs.select_one(".value")
@@ -104,7 +110,9 @@ def parse_row(li):
     plant = li.select_one("div.pd-row.lg .value")
     trace = li.select_one("div.pd-row.rg .value > span")
     made = li.select_one("div.pd-row.md .value > p")
+    img = li.select_one(".thumbnail img")
     return {
+        "img": (img.get("src") or "").strip() or None if img else None,
         "goods_no": gno,
         "name": name,
         "brand": _brand(name, _txt(li, ".value.brand span.show-mo")),
@@ -160,9 +168,10 @@ COLS = ["day", "category", "part", "grade_f", "total",
         "min_kg", "min_goods", "min_brand", "min_grade",      # 최저가 (명품 제외)
         "max_kg", "max_goods", "max_brand", "max_grade",      # 최고가 (명품 제외)
         "min_all_kg", "max_all_kg",                           # 참고: 명품 포함 최저/최고
-        "min_origin", "max_origin"]                           # 최저/최고 상품의 원산지(수입육)
+        "min_origin", "max_origin",                           # 최저/최고 상품의 원산지(수입육)
+        "pgrp", "min_img", "min_name"]                        # 부위 묶음(사이트 소제목), 최저가 상품 이미지·이름(세절육)
 TEXT_COLS = {"day", "category", "part", "grade_f", "min_goods", "min_brand", "min_grade",
-             "max_goods", "max_brand", "max_grade", "min_origin", "max_origin"}
+             "max_goods", "max_brand", "max_grade", "min_origin", "max_origin", "pgrp", "min_img", "min_name"}
 
 
 def init_db(con):
@@ -225,7 +234,7 @@ def export_latest(con, day):
 
 
 HIST_KEEP = ["day", "category", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand",
-             "min_all_kg", "max_all_kg", "min_grade", "max_grade", "min_origin", "max_origin"]
+             "min_all_kg", "max_all_kg", "min_grade", "max_grade", "min_origin", "max_origin", "pgrp"]
 
 
 def export_history(con):
@@ -524,12 +533,19 @@ def run_category(page, con, day, cat, cfg, only, resume):
         print(f"이어서 수집: {cat} 오늘 이미 받은 {len(done)}건은 건너뜁니다")
     print(f"\n===== {cat} =====", flush=True)
     enter_list(page, cfg["url"])
-    parts = [p for p in discover_parts(page, group) if (not only or p in only)]
-    print(f"{cat}: 수집할 부위 {len(parts)}개", flush=True)
-    for part in parts:
+    groups = cfg.get("groups") or [group]
+    plan = []                                              # (묶음, 사이트 부위 이름, 저장할 이름)
+    for g in groups:
+        for p in discover_parts(page, g):
+            plan.append((g, p))
+    dup = {p for _, p in plan if sum(1 for _, q in plan if q == p) > 1}
+    plan = [(g, p, f"{p}({g})" if p in dup else p) for g, p in plan]
+    plan = [x for x in plan if (not only or x[1] in only or x[2] in only)]
+    print(f"{cat}: 수집할 부위 {len(plan)}개", flush=True)
+    for group, site_part, part in plan:
         print(f"[부위] {part}", flush=True)
         try:
-            expect = click_part(page, part, group)
+            expect = click_part(page, site_part, group)
             shown = page.evaluate("() => (document.querySelector('.list-wrap .total')||{}).textContent")
             if expect is not None and not group and str(expect) != (shown or "").replace(",", ""):
                 print(f"[주의] {part}: 사이트 표시 {expect}건 / 목록 {shown}건 (부위 전환 확인 필요)")
@@ -599,7 +615,9 @@ def run_category(page, con, day, cat, cfg, only, resume):
                     continue
                 if lo["price_kg"] > hi["price_kg"]:
                     print(f"[주의] {part}/{grade}: 정렬이 반대로 적용됨(최저>최고). 확인 필요")
-                rec = {"day": day, "part": part, "grade_f": grade, "total": total,
+                rec = {"day": day, "part": part, "grade_f": grade, "total": total, "pgrp": group,
+                       "min_img": lo.get("img") if cfg.get("img") else None,
+                       "min_name": lo.get("name") if cfg.get("img") else None,
                        "min_kg": lo["price_kg"], "min_goods": lo["goods_no"], "min_brand": lo["brand"], "min_grade": lo["grade"],
                        "max_kg": hi["price_kg"], "max_goods": hi["goods_no"], "max_brand": hi["brand"], "max_grade": hi["grade"],
                        "min_all_kg": lo_all["price_kg"], "max_all_kg": hi_all["price_kg"],

@@ -5,7 +5,7 @@
 import glob, json, os, sys
 
 HIST_KEEP = ["day", "category", "part", "grade_f", "total", "min_kg", "max_kg", "min_brand", "max_brand",
-             "min_all_kg", "max_all_kg", "min_grade", "max_grade", "min_origin", "max_origin"]
+             "min_all_kg", "max_all_kg", "min_grade", "max_grade", "min_origin", "max_origin", "pgrp"]
 K = lambda r: (r["day"], r.get("category") or "한우거세", r["part"], r["grade_f"])
 
 def load(p, default):
