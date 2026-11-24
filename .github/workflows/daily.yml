@@ -87,6 +87,7 @@ jobs:
           mkdir -p ../out_part
           cp latest.json ../out_part/latest.json 2>/dev/null || echo "[]" > ../out_part/latest.json
           printf '%s' "$CAT" > ../out_part/cat.txt
+          if [ -z "$IN_PARTS" ]; then touch ../out_part/full.txt; fi   # 부위 전체 수집 → 그날 이 종류 값을 통째로 교체
       - uses: actions/upload-artifact@v4
         with:
           name: part-${{ strategy.job-index }}
