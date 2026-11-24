@@ -54,7 +54,8 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 
 .ct-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ct-top .btn{margin-left:auto;height:38px}
 .pronly{display:none}
-.ctb td.n .st{font-size:15px;padding:0 3px 0 0;vertical-align:-1px}
+.ctb td.n .st{font-size:15px;padding:0 3px 0 0;vertical-align:-1px;display:inline}
+.ctb td.n .pl{white-space:normal;display:inline;word-break:keep-all;overflow-wrap:anywhere}
 /* 종류 제목은 내려도 위에 고정 */
 .ct-h{position:sticky;top:0;z-index:6;background:var(--bg);padding:9px 2px 7px;margin:0 -2px 6px!important;box-shadow:0 1px 0 var(--line)}
 @media(max-width:600px){.ct-h{flex-wrap:nowrap;white-space:nowrap}.ct-h .d{display:none}.ct-h>a:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.ct-h .av{font-size:11.5px}}
@@ -73,6 +74,15 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
   .ctb td.mn em,.ctb td.mx em{font-size:7.5px}.ctb tr{break-inside:avoid}.ctb td.w .pb{font-size:8.5px}
   #cso{column-count:2;column-gap:6mm;column-rule:1px solid #e3ded6}.ct-sec{margin:0 0 8px;break-inside:auto}
 }
+
+/* 대표 이미지 */
+.imgb{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:baseline;gap:2px;text-decoration:underline dotted var(--mute);text-underline-offset:3px}
+.imgb .cam{font-size:10px;text-decoration:none}
+.imgsheet .imgbox{background:var(--chip);border-radius:14px;overflow:hidden;display:flex;justify-content:center;align-items:center;min-height:200px}
+.imgsheet .imgbox img{display:block;max-width:100%;max-height:52vh;object-fit:contain}
+.imgsheet .imgname{font-weight:700;margin:12px 0 4px;font-size:15px;line-height:1.4}
+.imgsheet .imgprice{font-size:14px;color:var(--sub)}.imgsheet .imgprice b{font-size:22px;color:var(--ink)}.imgsheet .imgprice .bd{display:block;font-size:12px;margin-top:2px}
+@media print{.imgb .cam{display:none}.imgb{text-decoration:none}}
 
 /* ── 홈 상단 숫자 · 바로가기 · 가입 요청 ── */
 @media(max-width:1023px){.pc-only{display:none!important}}
@@ -671,11 +681,12 @@ social();
 
 
 // ───────────────────────── 데이터 ─────────────────────────
-const CAT_ORDER=["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육","수입냉동우육","수입냉장돈육","수입냉동돈육"];
+const CAT_ORDER=["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육","수입냉동우육","수입냉장돈육","수입냉동돈육","계육","양육","염소","세절육"];
 const CAT_META={
   "한우거세":{c:"#8b2e2e",e:"🐂"},"한우암소":{c:"#b4553c",e:"🐄"},"육우거세":{c:"#a0702a",e:"🐂"},"육우암소":{c:"#6f7d3a",e:"🐄"},
   "국내산 돈육":{c:"#c2577a",e:"🐖"},"수입냉장우육":{c:"#2f6f9f",e:"🥩"},"수입냉동우육":{c:"#3b5b8c",e:"🧊"},
-  "수입냉장돈육":{c:"#7a5aa6",e:"🥓"},"수입냉동돈육":{c:"#5b4a8a",e:"🧊"}};
+  "수입냉장돈육":{c:"#7a5aa6",e:"🥓"},"수입냉동돈육":{c:"#5b4a8a",e:"🧊"},
+  "계육":{c:"#c98a1c",e:"🐔"},"양육":{c:"#4f8a6b",e:"🐑"},"염소":{c:"#7c6a55",e:"🐐"},"세절육":{c:"#2e7d8c",e:"🔪"}};
 const meta=c=>CAT_META[c]||{c:"#6c717a",e:"🥩"};
 const HIDE=["수입냉장우육(미국)","수입냉장우육(호주)","수입냉동우육(미국)","수입냉동우육(호주)","국내산돈육"];
 const GRADE_ORDER=["1++","1+","1","2","3","등외","PR","CAB","CH(SRA)","CH","CH(SS)","SEL","GF","PSA","S","A","YP/GF","전체"];
@@ -683,8 +694,11 @@ const PART_ORDER=["안심","등심","윗등심","아랫등심","채끝","목심"
 const BONE=new Set(["우족","사골","꼬리반골","알꼬리","잡뼈","잡육","도가니","스지","마구리","막내장"]);
 const BONE2=["사골","스지","도가니","꼬리","목뼈","학본","곱창","홍창","깐양","대동맥","등뼈","막창","미니족","장족","오소리감투","학"];
 const GRP_ORDER=["냉장","냉동","뼈·부산물"];
+// 종류별 묶음 순서: 기본 묶음 먼저, 나머지는 나온 순서대로
+const zonesOf=(c,ps)=>{const s=[...new Set(ps.map(p=>grp(c,p)))];return s.sort((a,b)=>{const i=GRP_ORDER.indexOf(a),j=GRP_ORDER.indexOf(b);return (i<0?9:i)-(j<0?9:j)||s.indexOf(a)-s.indexOf(b)})};
 const isC=g=>typeof g==="string"&&g.startsWith("국가:");
-const grp=(c,p)=>c.startsWith("수입냉동")?(BONE2.some(x=>p.startsWith(x))?"뼈·부산물":"냉동")
+const PGC=new Set(["계육","양육","염소","세절육"]);
+const grp=(c,p)=>PGC.has(c)?((D.pg&&D.pg.get(c+"|"+p))||"기타"):c.startsWith("수입냉동")?(BONE2.some(x=>p.startsWith(x))?"뼈·부산물":"냉동")
   :c.startsWith("수입냉장")?"냉장"
   :((p.startsWith("냉동")||p==="차돌박이")?"냉동":(BONE.has(p)?"뼈·부산물":"냉장"));
 const nm=p=>p==="차돌박이"?"차돌박이(냉동)":p;
@@ -697,6 +711,8 @@ const brandTxt=(r,w)=>{const b=sb(r[w+"_brand"]);const o=r[w+"_origin"];let g=r[
   return [b,[o,g].filter(Boolean).join("·")].filter(Boolean).join(" · ")};
 const bOnly=(r,w)=>[sb(r[w+"_brand"]),r[w+"_origin"]].filter(Boolean).join("·");
 const bdT=(r,w,full)=>{const t=full?brandTxt(r,w):bOnly(r,w);return t?`<em class="bd">${esc(t)}</em>`:""};
+// 대표 이미지가 있는 최저가(세절육)는 숫자를 누르면 사진이 보임
+const imgBtn=(r,inner)=>r&&r.min_img?`<button class="imgb" data-ik="${esc(r.day+"|"+K(r.category,r.part,r.grade_f))}" title="대표 이미지 보기">${inner}<span class="cam">📷</span></button>`:inner;
 const sortGrades=a=>[...GRADE_ORDER.filter(x=>a.includes(x)),...a.filter(x=>!GRADE_ORDER.includes(x)).sort()];
 const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const thinMark=r=>r&&r.total<=3?`<span class="thin" title="상품 ${r.total}개 (참고용)">※</span>`:"";
@@ -710,6 +726,7 @@ function build(src){
   D.rows=[...map.values()].filter(r=>r.total>0&&r.min_kg!=null&&!HIDE.includes(r.category));
   D.key=new Map();D.dk=new Map();
   for(const r of D.rows){const k=K(r.category,r.part,r.grade_f);if(!D.key.has(k))D.key.set(k,[]);D.key.get(k).push(r);D.dk.set(r.day+"|"+k,r)}
+  D.pg=new Map();for(const r of D.rows)if(r.pgrp)D.pg.set(r.category+"|"+r.part,r.pgrp);
   for(const a of D.key.values())a.sort((x,y)=>x.day<y.day?-1:x.day>y.day?1:0);
   const present=[...new Set(D.rows.map(r=>r.category))];
   D.cats=[...CAT_ORDER.filter(c=>present.includes(c)),...present.filter(c=>!CAT_ORDER.includes(c))];
@@ -739,7 +756,8 @@ function catInfo(c){
   rs.forEach(r=>{if(r.day<today&&!ps.includes(r.part))ps.push(r.part)});
   const beef=/^(한우|육우)/.test(c);
   const pi=p=>{if(!beef)return 0;const i=PART_ORDER.indexOf(p);return i<0?999:i};
-  const parts=ps.map((p,i)=>[p,i]).sort((a,b)=>(GRP_ORDER.indexOf(grp(c,a[0]))-GRP_ORDER.indexOf(grp(c,b[0])))||(pi(a[0])-pi(b[0]))||(a[1]-b[1])).map(x=>x[0]);
+  const zo=zonesOf(c,ps);
+  const parts=ps.map((p,i)=>[p,i]).sort((a,b)=>(zo.indexOf(grp(c,a[0]))-zo.indexOf(grp(c,b[0])))||(pi(a[0])-pi(b[0]))||(a[1]-b[1])).map(x=>x[0]);
   // 변동
   const moves=[];let comp=0;const ratios=[];
   if(prev)for(const r of main){
@@ -913,7 +931,7 @@ function favRows(f){
     const lo=rs.reduce((a,b)=>b.min_kg<a.min_kg?b:a),hi=rs.reduce((a,b)=>b.max_kg>a.max_kg?b:a);
     const mv=x.moves.filter(m=>m.r.part===p);const mp=mv.length?mv.sort((a,b)=>Math.abs(b.p)-Math.abs(a.p))[0]:null;
     return `<div class="lr"><div class="pn">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}">${esc(nm(p))}</button><span class="cchip" style="--c:${meta(c).c}">${esc(c)}</span></div>
-      <div class="lp"><span class="lab">최저</span><b>${won(lo.min_kg)}</b><em>${esc([lo.grade_f!=="전체"&&!lo.min_grade?lo.grade_f:"",brandTxt(lo,"min")].filter(Boolean).join(" · "))}</em></div>
+      <div class="lp"><span class="lab">최저</span>${imgBtn(lo,`<b>${won(lo.min_kg)}</b>`)}<em>${esc([lo.grade_f!=="전체"&&!lo.min_grade?lo.grade_f:"",brandTxt(lo,"min")].filter(Boolean).join(" · "))}</em></div>
       <div class="lp x"><span class="lab">최고</span><b>${won(hi.max_kg)}</b><em>${esc([hi.grade_f!=="전체"&&!hi.max_grade?hi.grade_f:"",brandTxt(hi,"max")].filter(Boolean).join(" · "))}</em></div>
       <div>${mp?badge(mp.p):`<span class="pb eq">– 변동 없음</span>`}</div></div>`}).join("");
 }
@@ -943,7 +961,7 @@ function viewCats(v){
         const o=pmin(c,x.prev,p);const pc=o&&o.min_kg?pctOf(lo.min_kg,o.min_kg):null;
         const t=(r,w)=>esc([r.grade_f!=="전체"&&!r[w+"_grade"]?r.grade_f:"",brandTxt(r,w)].filter(Boolean).join(" · "));
         const tl=t(lo,"min"),th=t(hi,"max");
-        rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn"><b>${won(lo.min_kg)}</b>${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
+        rows+=`<tr><td class="n">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(lo.grade_f)}">${esc(nm(p))}</button>${thinMark(lo)}</td><td class="mn">${imgBtn(lo,`<b>${won(lo.min_kg)}</b>`)}${tl?`<em>${tl}</em>`:""}</td><td class="mx">${won(hi.max_kg)}${th?`<em>${th}</em>`:""}</td><td class="w">${pc==null?`<span class="na">-</span>`:Math.abs(pc)<0.05?`<span class="pb eq">–</span>`:badge(pc)}</td></tr>`});
       html+=`<section class="ct-sec" style="--c:${meta(c).c}"><div class="ct-h"><a href="${link(c)}"><span class="ico">${meta(c).e}</span>${esc(c)}</a><span class="d">${x.today.slice(5).replace("-","/")} · ${ps.length}개 부위</span>${x.avg!=null?`<span class="av">${CL(x)} 평균 ${badge(x.avg)}</span>`:""}<a class="more" href="${link(c)}">등급별 ›</a></div>
         <div class="card ct-t"><table class="ctb"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>부위</th><th>최저 (원/Kg)</th><th>최고</th><th>${x.wkx?"전주 대비":"변동"}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
     }
@@ -971,7 +989,7 @@ function viewCat(v,c,tab){
 
 function tabTable(cv,c){
   const x=D.info[c],s=cst(c);R.wide=wideNow();
-  const zones=GRP_ORDER.filter(z=>x.parts.some(p=>grp(c,p)===z));
+  const zones=zonesOf(c,x.parts);
   const multi=x.grades.length>1;
   if(s.grade!=="all"&&!x.grades.includes(s.grade))s.grade="all";
   if(s.origin&&!x.origins.includes(s.origin))s.origin="";
@@ -1034,7 +1052,7 @@ function listRows(c,ps,g,sort){
   let last="",o=`<div class="lr hd"><span>부위</span><span>최저가 (원/Kg)</span><span>최고가 (원/Kg)</span><span>가격 범위</span></div>`;
   items.forEach(({p,r})=>{const gg=grp(c,p);if(sort==="part"&&gg!==last){o+=`<div class="alg">${gg}</div>`;last=gg}
     o+=`<div class="lr"><div class="pn">${starBtn(c,p)}<button class="pl" data-cat="${esc(c)}" data-part="${esc(p)}" data-g="${esc(g)}">${esc(nm(p))}</button>${thinMark(r)}</div>`+
-      (r?`<div class="lp"><span class="lab">최저</span><b>${won(r.min_kg)}</b><em>${esc(brandTxt(r,"min"))}</em></div>
+      (r?`<div class="lp"><span class="lab">최저</span>${imgBtn(r,`<b>${won(r.min_kg)}</b>`)}<em>${esc(brandTxt(r,"min"))}</em></div>
         <div class="lp x"><span class="lab">최고</span><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>
         <div class="rb" title="${won(r.min_kg)} ~ ${won(r.max_kg)}"><i style="left:${(r.min_kg-lo)/sp*100}%;width:${Math.max(2,(r.max_kg-r.min_kg)/sp*100)}%"></i></div>`
       :`<div><span class="so">품절</span></div><div></div><div></div>`)+`</div>`});
@@ -1044,7 +1062,7 @@ function listRows(c,ps,g,sort){
 function tabCmp(cv,c){
   const x=D.info[c],s=cst(c);
   const gs=[...x.grades];if(!gs.includes(s.cg))s.cg=gs.includes("1+")?"1+":gs[0];
-  const zones=GRP_ORDER.filter(z=>x.parts.some(p=>grp(c,p)===z));if(s.cz===""&&zones.length>1)s.cz=zones[0];
+  const zones=zonesOf(c,x.parts);if(s.cz===""&&zones.length>1)s.cz=zones[0];
   cv.innerHTML=`<div class="card"><div class="bar-tools">
      ${gs.length>1?`<span class="lbl">등급</span><div class="seg" id="cg">${gs.map(g=>`<button data-v="${esc(g)}">${esc(g)}</button>`).join("")}</div>`:""}
      <div class="seg" id="cmx"><button data-v="min_kg">최저가</button><button data-v="max_kg">최고가</button></div>
@@ -1141,7 +1159,7 @@ function openSheet(c,p,g0){
       <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:4px 12px;padding:0 8px 6px;font-size:11.5px;color:var(--mute);font-weight:700"><span style="min-width:3.4em">${x.origins.length?"구분":"등급"}</span><span>최저가 (원/Kg)</span><span>최고가 (원/Kg)</span></div>
       ${opts.map(g=>{const r=getR(c,x.today,p,g),o=x.prev&&getR(c,x.prev,p,g);
         return `<div class="sh-r ${g===sel?"on":""}" data-sel="${esc(g)}"><span class="g">${esc(isC(g)?g.slice(3):g)}</span>
-          ${r?`<div class="lp"><b>${won(r.min_kg)} ${o&&o.min_kg!==r.min_kg?badge(pctOf(r.min_kg,o.min_kg)):""}</b><em>${esc(brandTxt(r,"min"))}</em></div><div class="lp x"><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>`
+          ${r?`<div class="lp"><b>${imgBtn(r,won(r.min_kg))} ${o&&o.min_kg!==r.min_kg?badge(pctOf(r.min_kg,o.min_kg)):""}</b><em>${esc(brandTxt(r,"min"))}</em></div><div class="lp x"><b>${won(r.max_kg)}</b><em>${esc(brandTxt(r,"max"))}</em></div>`
           :`<span><span class="so">품절</span></span><span></span>`}</div>`}).join("")}
       <div class="card-h" style="margin:16px 0 4px;font-size:15px">최근 추이 <small>${esc(isC(sel)?sel.slice(3)+"산":sel)} · 최근 30회</small></div>
       ${chart({labels:ss.map(r=>r.day),series:[{n:"최저가",c:"var(--acc)",v:ss.map(r=>r.min_kg)},{n:"최고가",c:"#9aa0a8",v:ss.map(r=>r.max_kg)}],h:190})}
@@ -1153,6 +1171,24 @@ function openSheet(c,p,g0){
     drawCharts();
   };draw();
 }
+
+// ───────────────────────── 대표 이미지 ─────────────────────────
+function openImg(r){
+  const bg=document.createElement("div");bg.className="sheet-bg";bg.style.zIndex=60;document.body.appendChild(bg);
+  const close=()=>{bg.remove();document.removeEventListener("keydown",k)};const k=e=>{if(e.key==="Escape")close()};document.addEventListener("keydown",k);
+  bg.onclick=e=>{if(e.target===bg)close()};
+  const big=r.min_img;
+  const url=r.min_goods?"https://www.ekcm.co.kr/pd/productDetail?goodsNo="+encodeURIComponent(r.min_goods):SHOP;
+  bg.innerHTML=`<div class="sheet imgsheet" role="dialog" aria-label="대표 이미지">
+    <div class="sh-h"><h3>${esc(nm(r.part))} 최저가 상품</h3><button class="sh-x" aria-label="닫기">✕</button></div>
+    <div class="imgbox"><img src="${esc(big)}" alt="${esc(r.min_name||nm(r.part))}" referrerpolicy="no-referrer"></div>
+    ${r.min_name?`<p class="imgname">${esc(r.min_name)}</p>`:""}
+    <div class="imgprice"><b>${won(r.min_kg)}</b>원 <span>/ Kg</span>${bdT(r,"min",1)}</div>
+    <a class="cta buy" href="${url}" target="_blank" rel="noopener" style="margin-top:12px">🛒 금천미트에서 이 상품 보기</a></div>`;
+  const im=bg.querySelector(".imgbox img");im.onerror=()=>{im.closest(".imgbox").innerHTML='<div class="empty">이미지를 불러오지 못했어요</div>'};
+  bg.querySelector(".sh-x").onclick=close;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-ik]");if(!b)return;e.preventDefault();e.stopPropagation();const r=D.dk.get(b.dataset.ik);if(r&&r.min_img)openImg(r)},true);
 
 // ───────────────────────── 연락처 QR ─────────────────────────
 const QR_SVG=`<svg class="qr" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="전화 연결 QR 코드"><rect width="100%" height="100%" fill="#fff"/><path d="M2 2h7v1h-7zM10 2h1v1h-1zM12 2h3v1h-3zM20 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM13 3h2v1h-2zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM15 4h1v1h-1zM17 4h2v1h-2zM20 4h1v1h-1zM22 4h3v1h-3zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM13 5h2v1h-2zM16 5h3v1h-3zM20 5h1v1h-1zM22 5h3v1h-3zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM15 6h2v1h-2zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h3v1h-3zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h8v1h-8zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h7v1h-7zM10 9h2v1h-2zM13 9h2v1h-2zM16 9h1v1h-1zM2 10h1v1h-1zM6 10h1v1h-1zM8 10h3v1h-3zM12 10h1v1h-1zM14 10h4v1h-4zM19 10h5v1h-5zM26 10h1v1h-1zM3 11h1v1h-1zM7 11h1v1h-1zM9 11h2v1h-2zM12 11h3v1h-3zM19 11h1v1h-1zM21 11h4v1h-4zM4 12h3v1h-3zM8 12h1v1h-1zM15 12h3v1h-3zM21 12h4v1h-4zM2 13h1v1h-1zM9 13h3v1h-3zM13 13h1v1h-1zM15 13h1v1h-1zM18 13h1v1h-1zM20 13h1v1h-1zM23 13h2v1h-2zM3 14h2v1h-2zM6 14h1v1h-1zM8 14h3v1h-3zM12 14h4v1h-4zM18 14h1v1h-1zM20 14h1v1h-1zM23 14h4v1h-4zM2 15h2v1h-2zM5 15h3v1h-3zM9 15h2v1h-2zM12 15h1v1h-1zM15 15h3v1h-3zM19 15h1v1h-1zM21 15h2v1h-2zM24 15h1v1h-1zM5 16h1v1h-1zM7 16h2v1h-2zM10 16h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM21 16h3v1h-3zM4 17h1v1h-1zM6 17h1v1h-1zM11 17h2v1h-2zM14 17h1v1h-1zM16 17h2v1h-2zM23 17h3v1h-3zM2 18h4v1h-4zM7 18h2v1h-2zM10 18h4v1h-4zM15 18h2v1h-2zM18 18h9v1h-9zM10 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM17 19h2v1h-2zM22 19h1v1h-1zM25 19h1v1h-1zM2 20h7v1h-7zM10 20h2v1h-2zM13 20h4v1h-4zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h3v1h-3zM2 21h1v1h-1zM8 21h1v1h-1zM11 21h3v1h-3zM15 21h1v1h-1zM17 21h2v1h-2zM22 21h3v1h-3zM26 21h1v1h-1zM2 22h1v1h-1zM4 22h3v1h-3zM8 22h1v1h-1zM10 22h2v1h-2zM14 22h2v1h-2zM18 22h8v1h-8zM2 23h1v1h-1zM4 23h3v1h-3zM8 23h1v1h-1zM11 23h2v1h-2zM15 23h3v1h-3zM20 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h3v1h-3zM8 24h1v1h-1zM12 24h1v1h-1zM17 24h1v1h-1zM20 24h1v1h-1zM24 24h2v1h-2zM2 25h1v1h-1zM8 25h1v1h-1zM11 25h1v1h-1zM14 25h1v1h-1zM16 25h1v1h-1zM19 25h2v1h-2zM23 25h3v1h-3zM2 26h7v1h-7zM10 26h1v1h-1zM13 26h1v1h-1zM15 26h2v1h-2zM20 26h7v1h-7z" fill="#000"/></svg>`;
