@@ -39,7 +39,7 @@ jobs:
         run: |
           python3 - <<'EOF' >> "$GITHUB_OUTPUT"
           import json, os
-          ALL = ["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육","수입냉동우육","수입냉장돈육","수입냉동돈육"]
+          ALL = ["한우거세","한우암소","육우거세","육우암소","국내산 돈육","수입냉장우육","수입냉동우육","수입냉장돈육","수입냉동돈육","계육","양육","염소","세절육"]
           if os.environ.get("QUICK") == "true":
               cats = []
           elif os.environ.get("IN_CATS", "").strip():
