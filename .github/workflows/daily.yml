@@ -147,8 +147,8 @@ jobs:
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
         run: |
           python build.py
-          # open_days.txt 에 적힌 날짜(한 줄에 하나, 예: 2026-11-26)에는 입장코드 없이 공개
-          if [ -f open_days.txt ] && grep -qx "$(date +%F)" open_days.txt; then
+          # open_days.txt 에 always 가 있거나 오늘 날짜(한 줄에 하나, 예: 2026-11-26)가 있으면 입장코드 없이 공개
+          if [ -f open_days.txt ] && grep -qxE "always|$(date +%F)" open_days.txt; then
             echo "오늘은 입장코드 없이 공개합니다"
             cp plain.html index.html
             if [ -f pwa_inject.py ]; then python pwa_inject.py index.html; fi
