@@ -147,6 +147,13 @@ jobs:
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
         run: |
           python build.py
+          # open_days.txt 에 적힌 날짜(한 줄에 하나, 예: 2026-11-26)에는 입장코드 없이 공개
+          if [ -f open_days.txt ] && grep -qx "$(date +%F)" open_days.txt; then
+            echo "오늘은 입장코드 없이 공개합니다"
+            cp plain.html index.html
+            if [ -f pwa_inject.py ]; then python pwa_inject.py index.html; fi
+            exit 0
+          fi
           npx -y staticrypt@3 plain.html -p "$SITE_PASSWORD" --short --remember 30 -d out \
             --template-title "동원 금천미트 도매 단가표" \
             --template-instructions "입장코드를 입력해 주세요" \
