@@ -101,6 +101,13 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 footer.ft .a2l{display:block;margin:10px auto 0;font-weight:700;color:var(--acc)}
 @media print{.a2h,footer.ft .a2l{display:none!important}}
 
+/* 인쇄 코드: 확인 전에는 인쇄물에 안내문만 */
+.print-lock{display:none}
+@media print{
+  body:not(.print-ok) .wrap,body:not(.print-ok) .side,body:not(.print-ok) .bnav{display:none!important}
+  body:not(.print-ok) .print-lock{display:block!important;padding:40mm 10mm;text-align:center;font-size:16pt;line-height:1.6}
+}
+
 /* ── 홈 상단 숫자 · 바로가기 · 가입 요청 ── */
 @media(max-width:1023px){.pc-only{display:none!important}}
 .hs{display:grid;grid-template-columns:1fr 1fr 1.25fr 1.25fr;gap:8px;align-items:center;margin:0 0 12px}
@@ -493,6 +500,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
 </style>
 </head>
 <body>
+<div class="print-lock">🔒 인쇄하려면 사이트의 <b>인쇄 버튼</b>을 누르고 <b>인쇄 코드</b>를 입력해 주세요.<br>문의: 010-3371-8953</div>
 <div class="app">
   <aside class="side">
     <div class="side-title">도매 단가표</div>
@@ -969,7 +977,7 @@ function viewCats(v){
     <div class="chips ct-chips"><a href="#" data-cs="" class="${!CS.cat?"on":""}">전체보기</a><a href="#" data-cs="*fav" class="${CS.cat==="*fav"?"on":""}">★ 즐겨찾기</a>${D.cats.map(k=>`<a href="#" data-cs="${esc(k)}" class="${k===CS.cat?"on":""}"><span class="dot" style="background:${meta(k).c}"></span>${esc(k)}</a>`).join("")}</div>
     <div id="cso"></div>
     <div class="note">굵은 숫자가 Kg당 <b>최저가</b>, 회색이 최고가예요(등급 중 가장 싼 값 / 가장 비싼 값). 오른쪽은 최저가의 ${GCL()} 변동이에요. 부위를 누르면 등급별 가격을 볼 수 있어요.</div>`;
-  $("#csp").onclick=()=>window.print();
+  $("#csp").onclick=()=>printGate();
   v.querySelector(".ct-chips").onclick=e=>{const a=e.target.closest("[data-cs]");if(!a)return;e.preventDefault();CS.cat=a.dataset.cs;viewCats(v)};
   const draw=()=>{
     let html="";
@@ -1195,6 +1203,28 @@ function openSheet(c,p,g0){
   };draw();
 }
 
+// ───────────────────────── 인쇄 코드 ─────────────────────────
+// 인쇄할 때마다 코드 확인 (코드는 해시로만 저장). 확인 전에는 인쇄해도 내용이 안 나옴
+const PRINT_HASH="ea80bd83474375a15b61ecaaca398c4022e67dda14ac96016108930aaaa04779";
+async function sha256hex(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+function printGate(){
+  const bg=document.createElement("div");bg.className="sheet-bg";bg.style.zIndex=70;document.body.appendChild(bg);
+  const close=()=>bg.remove();bg.onclick=e=>{if(e.target===bg)close()};
+  bg.innerHTML=`<div class="sheet pgate" role="dialog" aria-label="인쇄 코드 입력"><div class="sh-h"><h3>🖨 인쇄 코드 입력</h3><button class="sh-x" aria-label="닫기">✕</button></div>
+    <p class="sub" style="margin:0 0 12px">인쇄하려면 코드를 입력해 주세요. 코드는 담당 매니저(${TELD})에게 문의하세요.</p>
+    <form id="pgf"><input class="inp" id="pgc" type="password" inputmode="text" autocomplete="off" placeholder="인쇄 코드" style="width:100%;height:50px;font-size:17px">
+    <div id="pgm" class="hint" style="color:var(--up);min-height:20px;margin:6px 2px"></div>
+    <button class="btn pri" type="submit" style="width:100%;height:50px;font-size:16px">확인하고 인쇄</button></form></div>`;
+  bg.querySelector(".sh-x").onclick=close;
+  const inp=bg.querySelector("#pgc");setTimeout(()=>inp.focus(),50);
+  bg.querySelector("#pgf").onsubmit=async e=>{e.preventDefault();
+    if(await sha256hex(inp.value.trim())!==PRINT_HASH){bg.querySelector("#pgm").textContent="코드가 맞지 않아요";inp.select();return}
+    close();document.body.classList.add("print-ok");setTimeout(()=>window.print(),80)};
+}
+addEventListener("afterprint",()=>document.body.classList.remove("print-ok"));
+// Ctrl+P(⌘+P)를 누르면 코드 창을 먼저 띄움
+addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==="p"||e.key==="P")){e.preventDefault();printGate()}});
+
 // ───────────────────────── 대표 이미지 ─────────────────────────
 function openImg(r,w="min"){
   const bg=document.createElement("div");bg.className="sheet-bg";bg.style.zIndex=60;document.body.appendChild(bg);
@@ -1247,7 +1277,7 @@ function viewPrint(v,onlyFav){
    <div class="note noprint">요약은 부위마다 등급·원산지와 상관없이 가장 싼 값과 가장 비싼 값을 한 줄로 보여줘요. 즐겨찾기는 이 기기(브라우저)에만 저장돼요.</div>`;
   $("#am").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===AM));
   $("#am").onclick=e=>{const b=e.target.closest("button");if(b){AM=b.dataset.v;viewPrint(v,onlyFav)}};
-  $("#prt").onclick=()=>window.print();
+  $("#prt").onclick=()=>printGate();
 }
 
 // ───────────────────────── 검색 · 사이드바 ─────────────────────────
