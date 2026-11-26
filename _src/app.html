@@ -90,6 +90,17 @@ svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .imgsheet .imgprice{font-size:14px;color:var(--sub)}.imgsheet .imgprice b{font-size:22px;color:var(--ink)}.imgsheet .imgprice .bd{display:block;font-size:12px;margin-top:2px}
 @media print{.imgb .cam{display:none}.imgb{text-decoration:none}}
 
+/* 홈 화면 바로가기 안내 */
+.inst.a2h{display:block}.a2h-h{display:flex;align-items:center;gap:10px}.a2h-h .x{margin-left:auto;display:flex;gap:6px;flex:none}
+.a2h-b{margin-top:10px;display:grid;gap:6px}
+.a2s{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.a2s summary{cursor:pointer;font-weight:700;padding:10px 0;list-style:none;display:flex;align-items:center;gap:6px}
+.a2s summary::-webkit-details-marker{display:none}.a2s summary::after{content:"▾";margin-left:auto;color:var(--mute)}.a2s[open] summary::after{content:"▴"}
+.a2s summary em{font-style:normal;font-size:11px;background:var(--acc);color:#fff;border-radius:999px;padding:1px 7px}
+.a2s ol{margin:0 0 10px;padding-left:20px;line-height:1.7;font-size:14px}.a2s .ic{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:0 4px;font-size:12px}
+footer.ft .a2l{display:block;margin:10px auto 0;font-weight:700;color:var(--acc)}
+@media print{.a2h,footer.ft .a2l{display:none!important}}
+
 /* ── 홈 상단 숫자 · 바로가기 · 가입 요청 ── */
 @media(max-width:1023px){.pc-only{display:none!important}}
 .hs{display:grid;grid-template-columns:1fr 1fr 1.25fr 1.25fr;gap:8px;align-items:center;margin:0 0 12px}
@@ -513,6 +524,7 @@ footer.ft .cp{display:block;margin-top:4px;font-size:14.5px;font-weight:800;colo
     <footer class="ft">
       개발자: 이현용 매니저 / 문의: 010-3371-8953
       <span class="cp">금천미트 가입 시 가입경로상세 - 이현용 기입 시 쿠폰 증정</span>
+      <a class="a2l" href="#" data-a2hs>📲 홈 화면에 바로가기 만드는 방법</a>
       <a class="adm-l" href="#/admin">관리</a>
     </footer>
   </div></main>
@@ -1265,12 +1277,33 @@ setInterval(checkVer,10*60*1000);document.addEventListener("visibilitychange",()
 let DEFER=null;
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();DEFER=e;if(R.r==="home")route()});
-function installCard(){
-  if(standalone||LS.get("instX")==="1"||INAPP)return "";
-  if(DEFER)return `<div class="inst">📲 <span><b>앱으로 설치</b>하면 홈 화면 아이콘으로 바로 열려요</span><span class="x"><button class="pri" id="insY">설치</button><button id="insN">닫기</button></span></div>`;
-  if(isIOS)return `<div class="inst">📲 <span>사파리 아래쪽 <b>공유 버튼 → '홈 화면에 추가'</b>를 누르면 앱처럼 쓸 수 있어요</span><span class="x"><button id="insN">닫기</button></span></div>`;
-  return "";
+// 홈 화면 바로가기 안내: 기기에 맞는 방법을 먼저 보여줌
+function a2hsSteps(){
+  const and=/Android/i.test(navigator.userAgent),sam=/SamsungBrowser/i.test(navigator.userAgent);
+  const L=[
+    {k:"ios",t:"🍎 아이폰 (사파리)",s:["화면 아래(또는 위) <b>공유 버튼 <span class='ic'>⬆︎</span></b>을 누르세요","목록을 올려 <b>'홈 화면에 추가'</b>를 누르세요","오른쪽 위 <b>'추가'</b>를 누르면 끝!"]},
+    {k:"and",t:"🤖 안드로이드 (크롬)",s:["오른쪽 위 <b>점 세 개 ⋮</b> 메뉴를 누르세요","<b>'홈 화면에 추가'</b> 또는 <b>'앱 설치'</b>를 누르세요","<b>'추가'/'설치'</b>를 누르면 끝!"]},
+    {k:"sam",t:"🌐 삼성 인터넷",s:["아래쪽 <b>메뉴 ≡</b> 를 누르세요","<b>'현재 페이지 추가' → '홈 화면'</b>을 누르세요"]},
+    {k:"app",t:"💬 카카오톡·네이버 앱 안에서 열었다면",s:["오른쪽 아래(또는 위) <b>⋮ / ⋯ 메뉴 → '다른 브라우저로 열기'</b>","크롬·사파리에서 열린 뒤 위 방법대로 추가하세요"]}];
+  const first=INAPP?"app":isIOS?"ios":sam?"sam":and?"and":"";
+  return L.sort((a,b)=>(b.k===first)-(a.k===first)).map((x,n)=>`<details class="a2s"${n===0&&first?" open":""}><summary>${x.t}${x.k===first?` <em>내 기기</em>`:""}</summary><ol>${x.s.map(t=>`<li>${t}</li>`).join("")}</ol></details>`).join("");
 }
+function installCard(){
+  if(standalone||LS.get("instX")==="1")return "";
+  return `<div class="inst a2h"><div class="a2h-h">📲 <span><b>홈 화면에 바로가기</b>를 만들면 앱처럼 한 번에 열려요</span>
+    <span class="x">${DEFER?`<button class="pri" id="insY">바로 설치</button>`:""}<button id="insN" aria-label="닫기">닫기</button></span></div>
+    <div class="a2h-b">${a2hsSteps()}</div></div>`;
+}
+function openA2hs(){
+  const bg=document.createElement("div");bg.className="sheet-bg";bg.style.zIndex=60;document.body.appendChild(bg);
+  const close=()=>bg.remove();bg.onclick=e=>{if(e.target===bg)close()};
+  bg.innerHTML=`<div class="sheet" role="dialog" aria-label="홈 화면 바로가기 방법"><div class="sh-h"><h3>📲 홈 화면 바로가기 만들기</h3><button class="sh-x" aria-label="닫기">✕</button></div>
+    <p class="sub" style="margin:0 0 10px">한 번 만들어 두면 주소를 다시 찾지 않고 아이콘만 눌러 바로 열 수 있어요.</p>
+    ${DEFER?`<button class="btn pri" id="insY2" style="width:100%;height:48px;margin-bottom:10px">이 기기에 바로 설치</button>`:""}${a2hsSteps()}</div>`;
+  bg.querySelector(".sh-x").onclick=close;
+  const y=bg.querySelector("#insY2");if(y)y.onclick=async()=>{try{DEFER.prompt();await DEFER.userChoice}catch(e){}DEFER=null;close()};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a2hs]");if(!b)return;e.preventDefault();openA2hs()});
 function bindInstall(){
   const y=$("#insY"),n=$("#insN");
   if(y)y.onclick=async()=>{try{DEFER.prompt();await DEFER.userChoice}catch(e){}DEFER=null;route()};
