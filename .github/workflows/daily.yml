@@ -170,6 +170,8 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add _src/latest.json _src/history.json _src/app.html index.html
           if [ -f version.json ]; then git add version.json; fi
+          if [ -d p ]; then git add -A p; fi
+          if [ -f sitemap.xml ]; then git add sitemap.xml; fi
           git add -u
           git commit -m "daily update $(date +%F)" || echo "no changes"
           git pull --rebase
